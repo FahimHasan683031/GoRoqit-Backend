@@ -320,6 +320,7 @@ const verifyAccount = async (email:string, onetimeCode: string):Promise<IAuthRes
       user: isUserExist._id,
       expireAt: new Date(Date.now() + 5 * 60 * 1000), // 15 minutes
     })
+    console.log(token.token)
 
     if(!token){
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong, please try again. or contact support.')

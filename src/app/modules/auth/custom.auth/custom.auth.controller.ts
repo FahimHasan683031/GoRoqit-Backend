@@ -4,6 +4,7 @@ import { CustomAuthServices } from './custom.auth.service'
 import sendResponse from '../../../../shared/sendResponse'
 import { StatusCodes } from 'http-status-codes'
 
+
 const customLogin = catchAsync(async (req: Request, res: Response) => {
   const { ...loginData } = req.body
 
@@ -59,12 +60,12 @@ const verifyAccount = catchAsync(async (req: Request, res: Response) => {
   const { oneTimeCode, phone, email } = req.body
 
   const result = await CustomAuthServices.verifyAccount(email, oneTimeCode)
-  const {status, message, accessToken, refreshToken, role} = result
+  const {status, message, accessToken, refreshToken, role,token} = result
   sendResponse(res, {
     statusCode: status,
     success: true,
     message: message,
-    data: {accessToken, refreshToken, role},
+    data: {accessToken, refreshToken, role,token},
   })
 })
 
