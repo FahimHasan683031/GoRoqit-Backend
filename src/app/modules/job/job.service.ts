@@ -1,116 +1,64 @@
-import { StatusCodes } from 'http-status-codes';
-import ApiError from '../../../errors/ApiError';
-import { IJobFilterables, IJob } from './job.interface';
-import { Job } from './job.model';
-import { JwtPayload } from 'jsonwebtoken';
-import { IPaginationOptions } from '../../../interfaces/pagination';
-import { paginationHelper } from '../../../helpers/paginationHelper';
-import { jobSearchableFields } from './job.constants';
-import { Types } from 'mongoose';
-import QueryBuilder from '../../builder/QueryBuilder';
+import { StatusCodes } from 'http-status-codes'
+import ApiError from '../../../errors/ApiError'
+import { IJob } from './job.interface'
+import { Job } from './job.model'
+import { JwtPayload } from 'jsonwebtoken'
+import { jobSearchableFields } from './job.constants'
+import { Types } from 'mongoose'
+import QueryBuilder from '../../builder/QueryBuilder'
 
-
-const createJob = async (
-  user: JwtPayload,
-  payload: IJob
-): Promise<IJob> => {
+const createJob = async (user: JwtPayload, payload: IJob): Promise<IJob> => {
   try {
-    const result = await Job.create(payload);
+    const result = await Job.create({ ...payload, user: user.authId })
     if (!result) {
-      
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Failed to create Job, please try again with valid data.'
-      );
+        'Failed to create Job, please try again with valid data.',
+      )
     }
 
-    return result;
+    return result
   } catch (error: any) {
-    
     if (error.code === 11000) {
-      throw new ApiError(StatusCodes.CONFLICT, 'Duplicate entry found');
+      throw new ApiError(StatusCodes.CONFLICT, 'Duplicate entry found')
     }
-    throw error;
+    throw error
   }
-};
+}
 
-const getAllJobs = async (
-  user: JwtPayload,
-  filterables: IJobFilterables,
-  pagination: IPaginationOptions
-) => {
-  const { searchTerm, ...filterData } = filterables;
-  const { page, skip, limit, sortBy, sortOrder } = paginationHelper.calculatePagination(pagination);
-  console.log(searchTerm)
-
-  const andConditions = [];
-
-
-  // Search functionality
-  if (searchTerm) {
-    andConditions.push({
-      $or: jobSearchableFields.map((field) => ({
-        [field]: {
-          $regex: searchTerm,
-          $options: 'i',
-        },
-      })),
-    });
-  }
-console.log(andConditions)
-  // Filter functionality
-  if (Object.keys(filterData).length) {
-    andConditions.push({
-      $and: Object.entries(filterData).map(([key, value]) => ({
-        [key]: value,
-      })),
-    });
-  }
-
-  const whereConditions = andConditions.length ? { $and: andConditions } : {};
-
-  const [result, total] = await Promise.all([
-    Job
-      .find(whereConditions)
-      .skip(skip)
-      .limit(limit)
-      .sort({ [sortBy]: sortOrder }),
-    Job.countDocuments(whereConditions),
-  ]);
-
-  return {
-    meta: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
-    data: result,
-  };
-};
+const getAllJobs = async (query: Record<string, unknown>) => {
+  const jobQuery = new QueryBuilder(Job.find(), query)
+    .filter()
+    .search(jobSearchableFields)
+    .sort()
+    .paginate()
+    .fields()
+  const jobs = await jobQuery.modelQuery
+  return jobs
+}
 
 const getSingleJob = async (id: string): Promise<IJob> => {
   if (!Types.ObjectId.isValid(id)) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Job ID');
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Job ID')
   }
 
-  const result = await Job.findById(id);
+  const result = await Job.findById(id).populate('user');
   if (!result) {
     throw new ApiError(
       StatusCodes.NOT_FOUND,
-      'Requested job not found, please try again with valid id'
-    );
+      'Requested job not found, please try again with valid id',
+    )
   }
 
-  return result;
-};
+  return result
+}
 
 const updateJob = async (
   id: string,
-  payload: Partial<IJob>
+  payload: Partial<IJob>,
 ): Promise<IJob | null> => {
   if (!Types.ObjectId.isValid(id)) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Job ID');
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Job ID')
   }
 
   const result = await Job.findByIdAndUpdate(
@@ -119,34 +67,34 @@ const updateJob = async (
     {
       new: true,
       runValidators: true,
-    }
-  );
+    },
+  )
 
   if (!result) {
     throw new ApiError(
       StatusCodes.NOT_FOUND,
-      'Requested job not found, please try again with valid id'
-    );
+      'Requested job not found, please try again with valid id',
+    )
   }
 
-  return result;
-};
+  return result
+}
 
 const deleteJob = async (id: string): Promise<IJob> => {
   if (!Types.ObjectId.isValid(id)) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Job ID');
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Job ID')
   }
 
-  const result = await Job.findByIdAndDelete(id);
+  const result = await Job.findByIdAndDelete(id)
   if (!result) {
     throw new ApiError(
       StatusCodes.NOT_FOUND,
-      'Something went wrong while deleting job, please try again with valid id.'
-    );
+      'Something went wrong while deleting job, please try again with valid id.',
+    )
   }
 
-  return result;
-};
+  return result
+}
 
 export const JobServices = {
   createJob,
@@ -154,4 +102,4 @@ export const JobServices = {
   getSingleJob,
   updateJob,
   deleteJob,
-};
+}

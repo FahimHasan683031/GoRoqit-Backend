@@ -55,9 +55,7 @@ const getAllJobs = catchAsync(async (req: Request, res: Response) => {
   console.log(filterables)
 
   const result = await JobServices.getAllJobs(
-    req.user!,
-    filterables,
-    pagination
+   req.query
   );
 
   sendResponse(res, {

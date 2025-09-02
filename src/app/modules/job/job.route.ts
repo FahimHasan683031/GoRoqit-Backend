@@ -28,10 +28,11 @@ router.get(
 
 router.post(
   '/',
-  // auth(
-  //    USER_ROLES.ADMIN,
-  //   USER_ROLES.RECRUITER
-  // ),
+  auth(
+     USER_ROLES.ADMIN,
+    USER_ROLES.RECRUITER,
+    USER_ROLES.APPLICANT
+  ),
   
   validateRequest(JobValidations.createJobZodSchema),
   JobController.createJob

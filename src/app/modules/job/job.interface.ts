@@ -1,24 +1,15 @@
-import { Model, Types } from 'mongoose';
-
-export interface IJobFilterables {
-  searchTerm?: string;
-  title?: string;
-  category?: string;
-  userEmail?: string;
-  description?: string;
-  responsibilities?: string;
-}
+import { Types } from 'mongoose';
 
 export interface IJob {
-  _id: Types.ObjectId;
   title: string;
-  category: string;
-  type: string;
+  category?: string;
+  type: 'Full-time' | 'Remote' | 'Freelance';
   startDate: Date;
   endDate?: Date;
-  userEmail: string;
-  description: string;
-  responsibilities: string;
+  minSalary: number;
+  maxSalary: number;
+  description?: string;
+  responsibilities?: string;
+  jobLocation: string;
+  user: Types.ObjectId;
 }
-
-export type JobModel = Model<IJob, {}, {}>;
