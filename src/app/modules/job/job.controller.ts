@@ -52,6 +52,7 @@ const getSingleJob = catchAsync(async (req: Request, res: Response) => {
 const getAllJobs = catchAsync(async (req: Request, res: Response) => {
   const filterables = pick(req.query, jobFilterables);
   const pagination = pick(req.query, paginationFields);
+  console.log(filterables)
 
   const result = await JobServices.getAllJobs(
     req.user!,

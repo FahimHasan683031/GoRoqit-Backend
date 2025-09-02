@@ -2,7 +2,7 @@
 export const jobFilterables = ['title', 'category', 'userEmail', 'description', 'responsibilities'];
 
 // Searchable fields for Job
-export const jobSearchableFields = ['title', 'category', 'userEmail', 'description', 'responsibilities'];
+export const jobSearchableFields = ['title', 'category'];
 
 // Helper function for set comparison
 export const isSetEqual = (setA: Set<string>, setB: Set<string>): boolean => {

@@ -7,6 +7,7 @@ import { IPaginationOptions } from '../../../interfaces/pagination';
 import { paginationHelper } from '../../../helpers/paginationHelper';
 import { jobSearchableFields } from './job.constants';
 import { Types } from 'mongoose';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 
 const createJob = async (
@@ -40,8 +41,10 @@ const getAllJobs = async (
 ) => {
   const { searchTerm, ...filterData } = filterables;
   const { page, skip, limit, sortBy, sortOrder } = paginationHelper.calculatePagination(pagination);
+  console.log(searchTerm)
 
   const andConditions = [];
+
 
   // Search functionality
   if (searchTerm) {
@@ -54,7 +57,7 @@ const getAllJobs = async (
       })),
     });
   }
-
+console.log(andConditions)
   // Filter functionality
   if (Object.keys(filterData).length) {
     andConditions.push({
