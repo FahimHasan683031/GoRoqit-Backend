@@ -1,6 +1,6 @@
 import express from 'express';
-import { ApplicantController } from './applicant.controller';
-import { ApplicantValidations } from './applicant.validation';
+import { ApplicationController } from './application.controller';
+import { ApplicationValidations } from './application.validation';
 import validateRequest from '../../middleware/validateRequest';
 import auth from '../../middleware/auth';
 import { USER_ROLES } from '../../../enum/user';
@@ -13,17 +13,19 @@ router.get(
   auth(
     USER_ROLES.ADMIN,
     USER_ROLES.RECRUITER,
+    USER_ROLES.APPLICANT
   ),
-  ApplicantController.getAllApplicants
+  ApplicationController.getAllApplications
 );
 
 router.get(
   '/:id',
   auth(
     USER_ROLES.RECRUITER,
-    USER_ROLES.ADMIN
+    USER_ROLES.ADMIN,
+    USER_ROLES.APPLICANT
   ),
-  ApplicantController.getSingleApplicant
+  ApplicationController.getSingleApplication
 );
 
 router.post(
@@ -32,8 +34,8 @@ router.post(
     USER_ROLES.APPLICANT
   ),
   
-  validateRequest(ApplicantValidations.create),
-  ApplicantController.createApplicant
+  validateRequest(ApplicationValidations.create),
+  ApplicationController.createApplication
 );
 
 router.patch(
@@ -42,8 +44,8 @@ router.patch(
     USER_ROLES.APPLICANT
   ),
   
-  validateRequest(ApplicantValidations.update),
-  ApplicantController.updateApplicant
+  validateRequest(ApplicationValidations.update),
+  ApplicationController.updateApplication
 );
 
 router.delete(
@@ -53,7 +55,7 @@ router.delete(
     USER_ROLES.RECRUITER,
     USER_ROLES.ADMIN
   ),
-  ApplicantController.deleteApplicant
+  ApplicationController.deleteApplication
 );
 
-export const ApplicantRoutes = router;
+export const ApplicationRoutes = router;

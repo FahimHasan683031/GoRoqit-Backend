@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const ApplicantValidations = {
+export const ApplicationValidations = {
   create: z.object({
     body: z.object({
       job: z.string(),
@@ -10,8 +10,7 @@ export const ApplicantValidations = {
       email: z.string(),
       phone: z.string(),
       resume: z.string(),
-      experience: z.number(),
-      appliedAt: z.string().datetime(),
+      experience: z.number()
     }),
   }),
 
@@ -24,8 +23,7 @@ export const ApplicantValidations = {
       email: z.string().optional(),
       phone: z.string().optional(),
       resume: z.string().optional(),
-      experience: z.number().optional(),
-      appliedAt: z.string().datetime().optional(),
+      experience: z.number().optional()
     }),
   }),
 }

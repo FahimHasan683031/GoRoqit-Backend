@@ -14,6 +14,7 @@ const jobSchema = new Schema<IJob>(
     responsibilities: { type: String, maxlength: 500 },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     jobLocation: { type: String, required: true },
+    applicationsCount: { type: Number, default: 0 },
   },
   {
     timestamps: true,

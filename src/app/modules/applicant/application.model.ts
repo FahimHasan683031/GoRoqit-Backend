@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
-import { IApplicant, ApplicantModel } from './applicant.interface'; 
+import { IApplication, ApplicationModel } from './application.interface'; 
 
-const applicantSchema = new Schema<IApplicant, ApplicantModel>({
+const ApplicationSchema = new Schema<IApplication, ApplicationModel>({
   job: { type: Schema.Types.ObjectId, ref: 'Job' },
   user: { type: Schema.Types.ObjectId, ref: 'User' },
   name: { type: String ,required: true }, 
@@ -10,10 +10,9 @@ const applicantSchema = new Schema<IApplicant, ApplicantModel>({
   email: { type: String ,required: true },
   phone: { type: String ,required: true },
   resume: { type: String ,required: true },
-  experience: { type: Number },
-  appliedAt: { type: Date }, 
+  experience: { type: Number }
 }, {
   timestamps: true
 });
 
-export const Applicant = model<IApplicant, ApplicantModel>('Applicant', applicantSchema);
+export const Application = model<IApplication, ApplicationModel>('Application', ApplicationSchema);

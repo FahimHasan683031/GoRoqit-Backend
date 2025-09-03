@@ -5,7 +5,8 @@ import express, { Router } from 'express'
 import { NotificationRoutes } from '../app/modules/notifications/notifications.route'
 import { PublicRoutes } from '../app/modules/public/public.route'
 import { JobRoutes } from '../app/modules/job/job.route'
-import { ApplicantRoutes } from '../app/modules/applicant/applicant.route'
+import { ApplicationRoutes } from '../app/modules/applicant/application.route'
+
 
 const router = express.Router()
 
@@ -19,7 +20,7 @@ const apiRoutes: { path: string; route: Router }[] = [
   { path: '/public', route: PublicRoutes },
 
   { path: '/job', route: JobRoutes },
-  // { path: '/applicant', route: ApplicantRoutes }
+  { path: '/application', route: ApplicationRoutes }
 ]
 
 apiRoutes.forEach(route => {
