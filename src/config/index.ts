@@ -32,9 +32,11 @@ export default {
   application_fee: process.env.APPLICATION_FEE,
   instant_transfer_fee: process.env.INSTANT_TRANSFER_FEE,
   openAi_api_key: process.env.OPENAI_API_KEY,
-  stripe_secret: process.env.STRIPE_SECRET_KEY,
-  stripe_account_id: process.env.STRIPE_ACCOUNT_ID,
-  webhook_secret: process.env.WEBHOOK_SECRET,
+  stripe: {
+    stripeSecretKey: process.env.STRIPE_API_SECRET,
+    webhookSecret: process.env.WEBHOOK_SECRET,
+    paymentSuccess: process.env.SUCCESS_URL,
+  },
   email: {
     from: process.env.EMAIL_FROM,
     user: process.env.EMAIL_USER,

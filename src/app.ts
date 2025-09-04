@@ -7,8 +7,15 @@ import { Morgan } from './shared/morgan'
 import cookieParser from 'cookie-parser'
 import globalErrorHandler from './app/middleware/globalErrorHandler'
 import passport from './app/modules/auth/passport.auth/config/passport'
+import handleStripeWebhook from './stripe/handleStripeWebhook';
 
 const app = express()
+
+app.post(
+  '/api/v1/stripe/webhook',
+  express.raw({ type: 'application/json' }),
+  handleStripeWebhook
+);
 
 //morgan
 app.use(Morgan.successHandler)

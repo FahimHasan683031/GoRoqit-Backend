@@ -1,4 +1,3 @@
-
 import { UserRoutes } from '../app/modules/user/user.route'
 import { AuthRoutes } from '../app/modules/auth/auth.route'
 import express, { Router } from 'express'
@@ -6,21 +5,18 @@ import { NotificationRoutes } from '../app/modules/notifications/notifications.r
 import { PublicRoutes } from '../app/modules/public/public.route'
 import { JobRoutes } from '../app/modules/job/job.route'
 import { ApplicationRoutes } from '../app/modules/applicant/application.route'
-
+import { stripePayments } from '../stripe/stripeRoute'
 
 const router = express.Router()
 
 const apiRoutes: { path: string; route: Router }[] = [
   { path: '/user', route: UserRoutes },
   { path: '/auth', route: AuthRoutes },
-
-
   { path: '/notifications', route: NotificationRoutes },
-
   { path: '/public', route: PublicRoutes },
-
   { path: '/job', route: JobRoutes },
-  { path: '/application', route: ApplicationRoutes }
+  { path: '/application', route: ApplicationRoutes },
+  { path: '/payments', route: stripePayments },
 ]
 
 apiRoutes.forEach(route => {
