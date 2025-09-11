@@ -33,6 +33,10 @@ const planSchema = new Schema<IPlan, PlanModel>(
             type: String,
             required: true
         },
+        priceId: {
+            type: String,
+            required: true
+        },
         status: {
             type: String,
             enum: ['Active', 'Delete'],

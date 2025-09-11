@@ -8,8 +8,6 @@ import { USER_ROLES, USER_STATUS } from '../../../enum/user'
 import { JwtPayload } from 'jsonwebtoken'
 import { logger } from '../../../shared/logger'
 
-
-
 const updateProfile = async (user: JwtPayload, payload: Partial<IUser>) => {
   // console.log(first)
   const updatedProfile = await User.findOneAndUpdate(
@@ -50,7 +48,7 @@ const createAdmin = async (): Promise<Partial<IUser> | null> => {
   })
 
   if (isAdminExist) {
-    logger.log('info', 'Admin account already exist, skipping creation.🦥')
+    logger.log('info', 'Admin account already exist, skipping creation.')
     return isAdminExist
   }
   const result = await User.create([admin])
@@ -60,4 +58,25 @@ const createAdmin = async (): Promise<Partial<IUser> | null> => {
   return result[0]
 }
 
-export const UserServices = {  updateProfile, createAdmin }
+const getAllUser = async () => {
+  const result = await User.find()
+  return result
+}
+
+const getSingleUser = async (id: string) => {
+  const result = await User.findById(id)
+  return result
+}
+// delete User
+const deleteUser = async (id: string) => {
+  const result = await User.findByIdAndDelete(id)
+  return result
+}
+
+export const UserServices = {
+  updateProfile,
+  createAdmin,
+  getAllUser,
+  getSingleUser,
+  deleteUser
+}

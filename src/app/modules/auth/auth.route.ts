@@ -6,12 +6,13 @@ import validateRequest from '../../middleware/validateRequest'
 import { AuthValidations } from './auth.validation'
 import { USER_ROLES } from '../../../enum/user'
 import auth, { tempAuth } from '../../middleware/auth'
+import { UserValidations } from '../user/user.validation'
 
 const router = express.Router()
 
 router.post(
   '/signup',
-  validateRequest(AuthValidations.createUserZodSchema),
+  validateRequest(UserValidations.userSignupSchema),
   CustomAuthController.createUser,
 )
 router.post(
@@ -64,9 +65,8 @@ router.post(
   '/resend-otp',
   tempAuth(
     USER_ROLES.ADMIN,
-    USER_ROLES.USER,
-    USER_ROLES.GUEST,
-    USER_ROLES.CUSTOMER,
+    USER_ROLES.APPLICANT,
+    USER_ROLES.RECRUITER,
   ),
   validateRequest(AuthValidations.resendOtpZodSchema),
   CustomAuthController.resendOtp,
@@ -74,14 +74,14 @@ router.post(
 
 router.post(
   '/change-password',
-  auth(USER_ROLES.ADMIN, USER_ROLES.USER, USER_ROLES.GUEST),
+  auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER),
   validateRequest(AuthValidations.changePasswordZodSchema),
   CustomAuthController.changePassword,
 )
 
 router.delete(
   '/delete-account',
-  auth(USER_ROLES.ADMIN, USER_ROLES.USER, USER_ROLES.GUEST),
+  auth(USER_ROLES.ADMIN, USER_ROLES.RECRUITER, USER_ROLES.APPLICANT),
   validateRequest(AuthValidations.deleteAccount),
   CustomAuthController.deleteAccount,
 )

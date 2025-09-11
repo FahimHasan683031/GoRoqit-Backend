@@ -43,7 +43,7 @@ const auth =
           if (error instanceof Error && error.name === 'TokenExpiredError') {
             throw new ApiError(StatusCodes.UNAUTHORIZED, 'Access Token has expired')
           }
-          throw new ApiError(StatusCodes.FORBIDDEN, 'Invalid Access Token')
+          next(error)
         }
       }
     } catch (error) {

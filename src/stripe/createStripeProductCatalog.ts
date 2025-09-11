@@ -4,7 +4,7 @@ import config from "../config";
 import { IPlan } from "../app/modules/plan/plan.interface";
 import ApiError from "../errors/ApiError";
 
-export const createStripeProductCatalog = async ( payload: Partial<IPlan>): Promise<{ productId: string; paymentLink: string } | null> => {
+export const createStripeProductCatalog = async ( payload: Partial<IPlan>): Promise<{ productId: string; paymentLink: string, priceId: string } | null> => {
 
     // Create Product in Stripe
     const product = await stripe.products.create({
@@ -12,7 +12,7 @@ export const createStripeProductCatalog = async ( payload: Partial<IPlan>): Prom
         description: payload.description as string,
     });
 
-    let interval: 'month' | 'year'; 
+    let interval: 'month' | 'year' = 'month'; 
     let intervalCount = 1; 
 
     // Map duration to interval_count
@@ -20,6 +20,14 @@ export const createStripeProductCatalog = async ( payload: Partial<IPlan>): Prom
         case '1 month':
             interval = 'month';
             intervalCount = 1;
+            break;
+        case '3 months':
+            interval = 'month';
+            intervalCount = 3;
+            break;
+        case '6 months':
+            interval = 'month';
+            intervalCount = 6;
             break;
         case '1 year':
             interval = 'year';
@@ -66,5 +74,5 @@ export const createStripeProductCatalog = async ( payload: Partial<IPlan>): Prom
         throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create payment link");
     }
 
-    return { productId: product.id, paymentLink: paymentLink.url };
+    return { productId: product.id, paymentLink: paymentLink.url, priceId: price.id };
 };

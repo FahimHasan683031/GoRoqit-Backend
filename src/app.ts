@@ -9,24 +9,28 @@ import globalErrorHandler from './app/middleware/globalErrorHandler'
 import passport from './app/modules/auth/passport.auth/config/passport'
 import handleStripeWebhook from './stripe/handleStripeWebhook';
 
-const app = express()
+const app = express();
 
-app.post(
-  '/api/v1/stripe/webhook',
-  express.raw({ type: 'application/json' }),
-  handleStripeWebhook
-);
 
-//morgan
-app.use(Morgan.successHandler)
-app.use(Morgan.errorHandler)
-//body parser
 app.use(
   cors({
     origin: '*',
     credentials: true,
   }),
 )
+
+// Stripe webhook route
+app.use('/api/stripe/webhook',
+    express.raw({ type: 'application/json' }),
+    handleStripeWebhook
+);
+
+
+//morgan
+app.use(Morgan.successHandler)
+app.use(Morgan.errorHandler)
+//body parser
+
 app.use(express.json())
 app.use(passport.initialize())
 app.use(express.urlencoded({ extended: true }))

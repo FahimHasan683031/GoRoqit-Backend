@@ -4,8 +4,10 @@ import express, { Router } from 'express'
 import { NotificationRoutes } from '../app/modules/notifications/notifications.route'
 import { PublicRoutes } from '../app/modules/public/public.route'
 import { JobRoutes } from '../app/modules/job/job.route'
-import { ApplicationRoutes } from '../app/modules/applicant/application.route'
-import { stripePayments } from '../stripe/stripeRoute'
+import { ApplicationRoutes } from '../app/modules/application/application.route'
+import { PlanRoutes } from '../app/modules/plan/plan.routes'
+import { SubscriptionRoutes } from '../app/modules/subscription/subscription.routes'
+import { ProfileRoutes } from '../app/modules/profile/profile.route'
 
 const router = express.Router()
 
@@ -16,7 +18,9 @@ const apiRoutes: { path: string; route: Router }[] = [
   { path: '/public', route: PublicRoutes },
   { path: '/job', route: JobRoutes },
   { path: '/application', route: ApplicationRoutes },
-  { path: '/payments', route: stripePayments },
+  { path: '/plan', route: PlanRoutes },
+  { path: '/subscription', route: SubscriptionRoutes },
+  { path: '/profile', route: ProfileRoutes },
 ]
 
 apiRoutes.forEach(route => {

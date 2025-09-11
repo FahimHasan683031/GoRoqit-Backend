@@ -8,7 +8,8 @@ export type IPlan = {
     paymentType: 'Monthly' | 'Yearly';
     productId?: string;
     paymentLink?: string;
-    status: 'Active' | 'Delete'
+    status: 'Active' | 'Delete';
+    priceId?: string;
 }
 
 export type PlanModel = Model<IPlan, Record<string, unknown>>;

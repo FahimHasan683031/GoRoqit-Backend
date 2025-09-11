@@ -1,25 +1,25 @@
 import express from "express";
-import auth from "../../middlewares/auth";
-import { USER_ROLES } from "../../../enums/user";
 import { PlanController } from "./plan.controller";
-import validateRequest from "../../middlewares/validateRequest";
 import { createPlanZodValidationSchema } from "./plan.validation";
+import auth from "../../middleware/auth";
+import { USER_ROLES } from "../user/user.interface";
+import validateRequest from "../../middleware/validateRequest";
 const router = express.Router()
 
 router.route("/")
     .post(
-        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+        auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER),
         validateRequest(createPlanZodValidationSchema),
         PlanController.createPlan
     )
     .get(
-        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+         auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER),
         PlanController.getPlan
     )
 
 router
     .route("/:id")
-    .patch(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), PlanController.updatePlan)
-    .delete(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), PlanController.deletePlan)
+    .patch( auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER), PlanController.updatePlan)
+    .delete( auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER), PlanController.deletePlan)
 
 export const PlanRoutes = router;
