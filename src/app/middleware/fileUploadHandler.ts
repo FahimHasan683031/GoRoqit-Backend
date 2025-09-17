@@ -1,133 +1,106 @@
-import { Request, Response, NextFunction } from 'express'
-import { StatusCodes } from 'http-status-codes'
-import multer, { FileFilterCallback } from 'multer'
-import sharp from 'sharp'
-import ApiError from '../../errors/ApiError'
+import { Request } from 'express';
+import fs from 'fs';
+import { StatusCodes } from 'http-status-codes';
+import multer, { FileFilterCallback } from 'multer';
+import path from 'path';
+import ApiError from '../../errors/ApiError';
 
 const fileUploadHandler = () => {
-  // Configure storage
-  const storage = multer.memoryStorage()
-
-  // File filter
-  const filterFilter = async (
-    req: Request,
-    file: Express.Multer.File,
-    cb: FileFilterCallback,
-  ) => {
-    try {
-      const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg']
-      const allowedMediaTypes = ['video/mp4', 'audio/mpeg']
-      const allowedDocTypes = ['application/pdf']
-
-      if (
-        ['image', 'license', 'signature', 'businessProfile'].includes(
-          file.fieldname,
-        )
-      ) {
-        if (allowedImageTypes.includes(file.mimetype)) {
-          cb(null, true)
-        } else {
-          cb(
-            new ApiError(
-              StatusCodes.BAD_REQUEST,
-              'Only .jpeg, .png, .jpg file supported',
-            ),
-          )
-        }
-      } else if (file.fieldname === 'media') {
-        if (allowedMediaTypes.includes(file.mimetype)) {
-          cb(null, true)
-        } else {
-          cb(
-            new ApiError(
-              StatusCodes.BAD_REQUEST,
-              'Only .mp4, .mp3 file supported',
-            ),
-          )
-        }
-      } else if (file.fieldname === 'doc') {
-        if (allowedDocTypes.includes(file.mimetype)) {
-          cb(null, true)
-        } else {
-          cb(new ApiError(StatusCodes.BAD_REQUEST, 'Only pdf supported'))
-        }
-      } else {
-        cb(new ApiError(StatusCodes.BAD_REQUEST, 'This file is not supported'))
-      }
-    } catch (error) {
-      cb(
-        new ApiError(
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          'File validation failed',
-        ),
-      )
-    }
+  //create upload folder
+  const baseUploadDir = path.join(process.cwd(), 'uploads');
+  if (!fs.existsSync(baseUploadDir)) {
+    fs.mkdirSync(baseUploadDir);
   }
 
-  // Configure multer
+  //folder create for different file
+  const createDir = (dirPath: string) => {
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath);
+    }
+  };
+
+  //create filename
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      let uploadDir;
+      switch (file.fieldname) {
+        case 'image':
+          uploadDir = path.join(baseUploadDir, 'image');
+          break;
+        case 'media':
+          uploadDir = path.join(baseUploadDir, 'media');
+          break;
+        case 'doc':
+          uploadDir = path.join(baseUploadDir, 'doc');
+          break;
+        default:
+          throw new ApiError(StatusCodes.BAD_REQUEST, 'File is not supported');
+      }
+      createDir(uploadDir);
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const fileExt = path.extname(file.originalname);
+      const fileName =
+        file.originalname
+          .replace(fileExt, '')
+          .toLowerCase()
+          .split(' ')
+          .join('-') +
+        '-' +
+        Date.now();
+      cb(null, fileName + fileExt);
+    },
+  });
+
+  //file filter
+  const filterFilter = (req: Request, file: any, cb: FileFilterCallback) => {
+    if (file.fieldname === 'image') {
+      if (
+        file.mimetype === 'image/jpeg' ||
+        file.mimetype === 'image/png' ||
+        file.mimetype === 'image/jpg'
+      ) {
+        cb(null, true);
+      } else {
+        cb(
+          new ApiError(
+            StatusCodes.BAD_REQUEST,
+            'Only .jpeg, .png, .jpg file supported'
+          )
+        );
+      }
+    } else if (file.fieldname === 'media') {
+      if (file.mimetype === 'video/mp4' || file.mimetype === 'audio/mpeg') {
+        cb(null, true);
+      } else {
+        cb(
+          new ApiError(
+            StatusCodes.BAD_REQUEST,
+            'Only .mp4, .mp3, file supported'
+          )
+        );
+      }
+    } else if (file.fieldname === 'doc') {
+      if (file.mimetype === 'application/pdf') {
+        cb(null, true);
+      } else {
+        cb(new ApiError(StatusCodes.BAD_REQUEST, 'Only pdf supported'));
+      }
+    } else {
+      cb(new ApiError(StatusCodes.BAD_REQUEST, 'This file is not supported'));
+    }
+  };
+
   const upload = multer({
     storage: storage,
     fileFilter: filterFilter,
-    limits: {
-      fileSize: 10 * 1024 * 1024, // 10 MB (adjust as needed)
-      files: 10, // Maximum number of files allowed
-    },
   }).fields([
-    { name: 'image', maxCount: 5 },
+    { name: 'image', maxCount: 3 },
     { name: 'media', maxCount: 3 },
     { name: 'doc', maxCount: 3 },
-  ])
+  ]);
+  return upload;
+};
 
-  // Process uploaded images with Sharp
-  const processImages = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    if (!req.files) return next()
-
-    try {
-      const imageFields = ['image', 'license', 'signature', 'businessProfile']
-
-      // Process each image field
-      for (const field of imageFields) {
-        const files = (req.files as any)[field]
-        if (!files) continue
-
-        // Process each file in the field
-        for (const file of files) {
-          if (!file.mimetype.startsWith('image')) continue
-
-          // Resize and optimize the image
-          const optimizedBuffer = await sharp(file.buffer)
-            .resize(1024) // Resize to max width of 800px (maintain aspect ratio)
-            .jpeg({ quality: 80 }) // Compress with 80% quality
-            .png({ quality: 80 }) // Compress with 80% quality
-            .jpeg({ quality: 80 }) // Compress with 80% quality
-            .toBuffer()
-
-          // Replace the original buffer with the optimized one
-          file.buffer = optimizedBuffer
-        }
-      }
-      next()
-    } catch (error) {
-      next(
-        new ApiError(
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          'Image processing failed',
-        ),
-      )
-    }
-  }
-
-  // Return middleware chain
-  return (req: Request, res: Response, next: NextFunction) => {
-    upload(req, res, err => {
-      if (err) return next(err)
-      processImages(req, res, next)
-    })
-  }
-}
-
-export default fileUploadHandler
+export default fileUploadHandler;

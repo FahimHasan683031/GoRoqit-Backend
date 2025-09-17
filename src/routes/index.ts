@@ -8,6 +8,8 @@ import { ApplicationRoutes } from '../app/modules/application/application.route'
 import { PlanRoutes } from '../app/modules/plan/plan.routes'
 import { SubscriptionRoutes } from '../app/modules/subscription/subscription.routes'
 import { ProfileRoutes } from '../app/modules/profile/profile.route'
+import { ChatRoutes } from '../app/modules/chat/chat.routes'
+import { MessageRoutes } from '../app/modules/message/message.routes'
 
 const router = express.Router()
 
@@ -21,6 +23,8 @@ const apiRoutes: { path: string; route: Router }[] = [
   { path: '/plan', route: PlanRoutes },
   { path: '/subscription', route: SubscriptionRoutes },
   { path: '/profile', route: ProfileRoutes },
+  { path: '/chat', route: ChatRoutes },
+  { path: '/message', route: MessageRoutes },
 ]
 
 apiRoutes.forEach(route => {

@@ -1,7 +1,6 @@
 import cors from 'cors'
 import express, { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-
 import router from './routes'
 import { Morgan } from './shared/morgan'
 import cookieParser from 'cookie-parser'
