@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../../../errors/ApiError'
 import { User } from '../../user/user.model'
 
-import { IUser } from '../../user/user.interface'
+import { IUser, USER_ROLES } from '../../user/user.interface'
 import { AuthHelper } from '../auth.helper'
 import { IAuthResponse } from '../auth.interface'
 import { authResponse } from '../common'
@@ -27,13 +27,11 @@ const handleGoogleLogin = async (payload: IUser & { profile: any }): Promise<IAu
 
   const userData = {
     email: emails[0].value,
-    profile: photos[0].value,
     name: displayName,
     verified: true,
     password: id,
     status: USER_STATUS.ACTIVE,
-    appId: id,
-    role: payload.role,
+    role: USER_ROLES.GUEST,
   }
 
   try {

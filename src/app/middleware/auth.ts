@@ -11,7 +11,6 @@ const auth =
     try {
       const tokenWithBearer = req.headers.authorization
 
-      console.log('hit')
 
       if (!tokenWithBearer) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'Token not found!')

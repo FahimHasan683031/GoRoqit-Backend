@@ -19,7 +19,7 @@ app.use(
 )
 
 // Stripe webhook route
-app.use('/api/stripe/webhook',
+app.use('/webhook',
     express.raw({ type: 'application/json' }),
     handleStripeWebhook
 );

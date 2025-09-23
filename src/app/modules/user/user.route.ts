@@ -25,6 +25,11 @@ router.patch(
 router.get('/',UserController.getAllUser),
 // get single user
 router.get('/:id',UserController.getSingleUser)
+// update user role and create profile
+router.patch(
+  '/:id/role',
+  UserController.updateUserRoleAndCreateProfile,
+)
 // delete user
 router.delete('/:id',UserController.deleteUser)
 

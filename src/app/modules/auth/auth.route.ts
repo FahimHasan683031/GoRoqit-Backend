@@ -23,7 +23,7 @@ router.post(
 router.post(
   '/login',
   validateRequest(AuthValidations.loginZodSchema),
-  passport.authenticate('local', { session: false }),
+  passport.authenticate('local', { session: false }), 
   PassportAuthController.login,
 )
 
@@ -63,11 +63,11 @@ router.post(
 
 router.post(
   '/resend-otp',
-  tempAuth(
-    USER_ROLES.ADMIN,
-    USER_ROLES.APPLICANT,
-    USER_ROLES.RECRUITER,
-  ),
+  // tempAuth(
+  //   USER_ROLES.ADMIN,
+  //   USER_ROLES.APPLICANT,
+  //   USER_ROLES.RECRUITER,
+  // ),
   validateRequest(AuthValidations.resendOtpZodSchema),
   CustomAuthController.resendOtp,
 )
@@ -85,7 +85,7 @@ router.delete(
   validateRequest(AuthValidations.deleteAccount),
   CustomAuthController.deleteAccount,
 )
-router.post('/refresh-token', CustomAuthController.getRefreshToken)
+router.post('/access-token', CustomAuthController.getAccessToken)
 
 router.post('/social-login', validateRequest(AuthValidations.socialLoginZodSchema), CustomAuthController.socialLogin)
 

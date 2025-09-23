@@ -8,8 +8,6 @@ const notificationSchema = new Schema<INotification, NotificationModel>(
     title: { type: String },
     body: { type: String },
     isRead: { type: Boolean },
-    createdAt: { type: Date },
-    updatedAt: { type: Date },
   },
   {
     timestamps: true,

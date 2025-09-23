@@ -43,7 +43,7 @@ export const createStripeProductCatalog = async ( payload: Partial<IPlan>): Prom
     const price = await stripe.prices.create({
         product: product.id,
         unit_amount: Number(payload.price) * 100, // in cents
-        currency: 'usd', // or your chosen currency
+        currency: 'gbp', // or your chosen currency
         recurring: { interval, interval_count: intervalCount },
     });
 

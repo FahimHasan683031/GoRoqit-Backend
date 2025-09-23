@@ -6,20 +6,6 @@ import ApiError from "../../../errors/ApiError";
 import config from "../../../config";
 
 
-const AuthenticationSchema = new Schema(
-  {
-    restrictionLeftAt: { type: Date, default: null },
-    resetPassword: { type: Boolean, default: false },
-    wrongLoginAttempts: { type: Number, default: 0 },
-    passwordChangedAt: { type: Date, default: null },
-    oneTimeCode: { type: String, default: null },
-    latestRequestAt: { type: Date, default: null },
-    expiresAt: { type: Date, default: null },
-    requestCount: { type: Number, default: 0 },
-    authType: { type: String, default: null },
-  },
-  { _id: false }
-);
 
 const UserSchema = new Schema<IUser, UserModel>(
   {
@@ -49,17 +35,66 @@ const UserSchema = new Schema<IUser, UserModel>(
     role: {
       type: String,
       enum: Object.values(USER_ROLES),
-      required: true,
+      default: USER_ROLES.GUEST,
+    },
+    name: {
+      type: String,
+      default: null,
     },
     profile: {
       type: Schema.Types.ObjectId,
       ref: "Profile",
       default: null,
     },
+    companyName: {
+      type: String,
+      required: false,
+    },
     authentication: {
-      type: AuthenticationSchema,
-      default: () => ({}),
-      select: false, 
+      _id: false,
+      select: false,
+      type: {
+        restrictionLeftAt: {
+          type: Date,
+          default: null,
+        },
+        resetPassword: {
+          type: Boolean,
+          default: false,
+        },
+        wrongLoginAttempts: {
+          type: Number,
+          default: 0,
+        },
+        passwordChangedAt: {
+          type: Date,
+          default: null,
+        },
+        oneTimeCode: {
+          type: String,
+          default: null,
+        },
+        latestRequestAt: {
+          type: Date,
+          default: null,
+        },
+        expiresAt: {
+          type: Date,
+          default: null,
+        },
+        requestCount: {
+          type: Number,
+          default: 0,
+        },
+        authType: {
+          type: String,
+          default: null,
+        },
+      },
+    },
+    subscribe: {
+      type: Boolean,
+      default: false,
     },
   },
   {

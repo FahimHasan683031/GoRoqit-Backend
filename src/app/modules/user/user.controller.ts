@@ -4,6 +4,7 @@ import catchAsync from '../../../shared/catchAsync'
 import sendResponse from '../../../shared/sendResponse'
 import { UserServices } from './user.service'
 import { IUser } from './user.interface'
+import config from '../../../config'
 
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
   const { image, ...userData } = req.body
@@ -39,6 +40,27 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+// update userRole
+const updateUserRoleAndCreateProfile = catchAsync(async (req: Request, res: Response) => {
+  const { role, ...profileData } = req.body
+
+  const result = await UserServices.updateUserRoleAndCreateProfile(req.params.id, role, profileData)
+  const { status, message, accessToken, refreshToken, role:Role, token } = result
+  if (refreshToken) {
+    res.cookie('refreshToken', refreshToken, {
+      secure: config.node_env === 'production',
+      httpOnly: true,
+    })
+  }
+
+  sendResponse(res, {
+    statusCode: status,
+    success: true,
+    message: message,
+    data: { accessToken, refreshToken, Role, token },
+  })
+})
+
 // delete user
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
   const result = await UserServices.deleteUser(req.params.id)
@@ -50,9 +72,12 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+
+
 export const UserController = {
   getAllUser,
   updateProfile,
   getSingleUser,
   deleteUser,
+  updateUserRoleAndCreateProfile
 }

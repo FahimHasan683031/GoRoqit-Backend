@@ -11,11 +11,6 @@ const subscriptionSchema = new Schema<ISubscription, SubscriptionModel>(
             type: Number,
             required: true
         },
-        vendor: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-            required: true
-        },
         plan: {
             type: Schema.Types.ObjectId,
             ref: "Plan",
@@ -23,7 +18,7 @@ const subscriptionSchema = new Schema<ISubscription, SubscriptionModel>(
         },
         trxId: {
             type: String,
-            required: true
+            required: false
         },
         subscriptionId: {
             type: String,
@@ -43,6 +38,7 @@ const subscriptionSchema = new Schema<ISubscription, SubscriptionModel>(
             default: "active",
             required: true
         },
+        
 
     },
     {

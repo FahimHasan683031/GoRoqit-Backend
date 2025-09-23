@@ -4,6 +4,7 @@ import { JobValidations } from './job.validation';
 import validateRequest from '../../middleware/validateRequest';
 import auth from '../../middleware/auth';
 import { USER_ROLES } from '../../../enum/user';
+import { validateJobCreation } from '../../middleware/validateJobCreation';
 
 
 const router = express.Router();
@@ -33,7 +34,7 @@ router.post(
     USER_ROLES.RECRUITER,
     USER_ROLES.APPLICANT
   ),
-  
+  validateJobCreation,
   validateRequest(JobValidations.createJobZodSchema),
   JobController.createJob
 );

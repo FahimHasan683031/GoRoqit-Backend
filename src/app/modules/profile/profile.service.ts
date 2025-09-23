@@ -15,8 +15,12 @@ const CreateOrUpdataeProfile= async (user:JwtPayload,payload: IProfile): Promise
 
       // Check if user exists
       const isExistUser = await User.findById(user.authId).session(session);
-      if (!isExistUser) {
+      console.log('CreateOrUpdataeProfile', isExistUser)     
+       if (!isExistUser) {
         throw new Error("User not found");
+      }
+      if(isExistUser.role !== payload.role){
+        throw new Error("Role can't be updated")
       }
 
       // Check if profile exists

@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import stripe from "../../../config/stripe";
 import { createStripeProductCatalog } from "../../../stripe/createStripeProductCatalog";
 import ApiError from "../../../errors/ApiError";
+import { deleteStripeProductCatalog } from "../../../stripe/deleteStripeProductCatalog";
 
 const createPlanToDB = async(payload: IPlan): Promise<IPlan | null>=>{
 
@@ -135,6 +136,15 @@ const getPlanDetailsFromDB = async(id: string): Promise<IPlan | null>=>{
 const deletePlanToDB = async(id: string): Promise<IPlan | null>=>{
     if(!mongoose.Types.ObjectId.isValid(id)){
         throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid ID")
+    }
+
+    const isExist = await Plan.findById(id);
+    if(!isExist){
+        throw new ApiError(StatusCodes.NOT_FOUND, "Plan not found")
+    }
+
+    if(isExist.productId){
+        await deleteStripeProductCatalog(isExist.productId)
     }
 
     const result = await Plan.findByIdAndUpdate(

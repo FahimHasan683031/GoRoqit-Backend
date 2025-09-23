@@ -52,13 +52,11 @@ export type IProfile = {
   lastName?: string;
   image?: string;
   phone?: string;
-  bio?: string;
-  
+  bio?: string;  
   // Role-specific data
   applicantData?: IApplicantData;
   recruiterData?: IRecruiterData;
   adminData?: IAdminData;
-
   createdAt: Date;
   updatedAt: Date;
 };

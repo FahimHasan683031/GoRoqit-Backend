@@ -1,4 +1,4 @@
-import { optional, z } from 'zod'
+import {  z } from 'zod'
 import { USER_ROLES } from '../../../enum/user'
 
 const verifyEmailOrPhoneOtpZodSchema = z.object({
@@ -61,7 +61,7 @@ const loginZodSchema = z.object({
         message: 'Invalid phone number format',
       }),
     deviceToken: z.string().min(1).optional(),
-    password: z.string().min(8, { message: 'Password is required' }),
+    password: z.string(),
   }),
 })
 
@@ -96,7 +96,7 @@ const resendOtpZodSchema = z.object({
       .refine(value => !value || /^\+?[1-9]\d{1,14}$/.test(value), {
         message: 'Invalid phone number format',
       }),
-      authType:z.string(z.enum(['resetPassword','createAccount']).optional())
+      authType:z.string(z.enum(['resetPassword','createAccount']))
   }),
 })
 
@@ -141,9 +141,9 @@ const createUserZodSchema = z.object({
     role: z.enum(
       [
         USER_ROLES.ADMIN,
-        USER_ROLES.USER,
-        USER_ROLES.GUEST,
-        USER_ROLES.CUSTOMER,
+        USER_ROLES.ADMIN,
+        USER_ROLES.RECRUITER,
+        USER_ROLES.APPLICANT,
       ],
       {
         message: 'Role must be one of admin, user, guest',

@@ -35,7 +35,7 @@ export const updateStripeProductCatalog = async ( productId: string, payload:any
     const price = await stripe.prices.create({
         product: productId,
         unit_amount: payload.price && payload.price * 100,
-        currency: 'usd',
+        currency: 'gbp',
         recurring: { interval, interval_count: intervalCount },
     });
 

@@ -15,7 +15,7 @@ import { jwtHelper } from '../../../../helpers/jwtHelper'
 import { JwtPayload } from 'jsonwebtoken'
 import { IUser } from '../../user/user.interface'
 import { emailHelper } from '../../../../helpers/emailHelper'
-// import { emailQueue } from '../../../../helpers/bull-mq-producer'
+
 
 
 const createUser = async (payload: IUser) => {
@@ -304,7 +304,6 @@ const verifyAccount = async (email:string, onetimeCode: string):Promise<IAuthRes
 
     const tokens = AuthHelper.createToken(isUserExist._id, isUserExist.role, isUserExist.name, isUserExist.email )
 
-    console.log({tokens})
 
    return authResponse(StatusCodes.OK, `Welcome ${isUserExist.name} to our platform.`, isUserExist.role, tokens.accessToken, tokens.refreshToken)
   }else{
@@ -332,7 +331,10 @@ const verifyAccount = async (email:string, onetimeCode: string):Promise<IAuthRes
 
 }
 
-const getRefreshToken = async (token: string) => {
+const getAccessToken = async (token: string) => {
+  if (!token) {
+    throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh Token is required')
+  }
   try {
     const decodedToken = jwtHelper.verifyToken(
       token,
@@ -530,7 +532,7 @@ const resendOtp = async (email:string, authType:'createAccount' | 'resetPassword
       otp,
       type: authType,
     })
-    // emailQueue.add('emails', forgetPasswordEmailTemplate)
+    emailHelper.sendEmail(forgetPasswordEmailTemplate)
   }
 
   
@@ -587,7 +589,7 @@ export const CustomAuthServices = {
   resetPassword,
   verifyAccount,
   customLogin,
-  getRefreshToken,
+  getAccessToken,
   socialLogin,
   resendOtpToPhoneOrEmail,
   deleteAccount,
