@@ -6,6 +6,12 @@ export const recruiterDataSchema = z.object({
   companyWebsite: z.string().url().optional(),
   companyDescription: z.string().optional(),
   companyLogo: z.string().url().optional(),
+  companyEmail: z.string().email().optional(),
+  location: z.string().optional(),
+  linkedinProfile: z.string().url().optional(),
+  twitterProfile: z.string().url().optional(),
+  facebookProfile: z.string().url().optional(),
+  instagramProfile: z.string().url().optional(),
 });
 
 // Recruiter Profile Create Schema
@@ -26,6 +32,12 @@ export const recruiterProfileUpdateSchema = z.object({
     companyWebsite: z.string().url().optional(),
     companyDescription: z.string().optional(),
     companyLogo: z.string().url().optional(),
+    companyEmail: z.string().email().optional(),
+    location: z.string().optional(),
+    linkedinProfile: z.string().url().optional(),
+    twitterProfile: z.string().url().optional(),
+    facebookProfile: z.string().url().optional(),
+    instagramProfile: z.string().url().optional(),
   })
 });
 

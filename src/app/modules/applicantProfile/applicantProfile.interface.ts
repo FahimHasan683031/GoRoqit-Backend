@@ -5,9 +5,10 @@ export type IEducation = {
   instituteName: string;
   major?: string;
   result?: string;
-  grade?: string;
-  startDate?: Date;
-  endDate?: Date;
+  scale?: string;
+  duration?: string;
+  yearOfPassing?: number;
+  cgpa?: number;
 };
 
 export type IWorkExperience = {
@@ -17,7 +18,7 @@ export type IWorkExperience = {
   employmentType: "Full-time" | "Part-time" | "Contract" | "Internship" | "Other";
   startDate?: Date;
   endDate?: Date;
-  duration?: string;
+  experience?: string;
 };
 
 export type IApplicantProfile = {
@@ -32,8 +33,22 @@ export type IApplicantProfile = {
   salaryExpectation?: string;
   openToWork: boolean;
   firstName?: string;
+  middleName?: string;
+  preferredName?: string;
   lastName?: string;
-  phone?: string;
+  gender?: "Male" | "Female" | "Other";
+  maritalStatus?: "Single" | "Married" | "Divorced" | "Widowed";
+  citizenship?: string;
+  dateOfBirth?: Date;
+  age?: number;
+  previousEmployment?:"Yes"|"No";
+  compiteAddrase?: string;
+  country?: string;
+  city?: string;
+  zipCode?: string;
+  province?: string;
+  mobile?: string;
+  landLine?: string;
   bio?: string;
   createdAt: Date;
   updatedAt: Date;

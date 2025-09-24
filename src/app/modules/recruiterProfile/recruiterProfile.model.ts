@@ -15,6 +15,12 @@ const RecruiterProfileSchema = new Schema<IRecruiterProfile>(
     companyDescription: { type: String, default:null },
     companyLogo: { type: String, default:null },
     phone: { type: String, default:null },
+    companyEmail: { type: String, default:null },
+    location: { type: String, default:null },
+    linkedinProfile: { type: String, default:null },
+    twitterProfile: { type: String, default:null },
+    facebookProfile: { type: String, default:null },
+    instagramProfile: { type: String, default:null },
     bio: { type: String, maxlength: 500 },
   },
   { timestamps: true }

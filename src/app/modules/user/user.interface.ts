@@ -51,7 +51,24 @@ export interface IUpdateProfilePayload {
   name?: string;
   email?: string;
   phone?: string;
+  middleName?: string;
+  preferredName?: string;
+  gender?: string;
+  maritalStatus?: string;
+  citizenship?: string;
+  dateOfBirth?: Date;
+  age?: number;
+  previousEmployment?: string;
+  compiteAddrase?: string;
+  country?: string;
+  city?: string;
+  zipCode?: string;
+  linkedinProfile?: string;
+  twitterProfile?: string;
+  facebookProfile?: string;
+  instagramProfile?: string;
   firstName?: string;
+  image?: string;
   lastName?: string;
   resume?: string;
   skills?: string[];
@@ -66,6 +83,8 @@ export interface IUpdateProfilePayload {
   companyWebsite?: string;
   companyDescription?: string;
   companyLogo?: string;
+  companyEmail?: string;
+  location?: string;
 }
 
 export type UserModel = {

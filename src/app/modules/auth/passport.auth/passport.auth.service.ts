@@ -8,6 +8,7 @@ import { IUser, USER_ROLES } from '../../user/user.interface'
 import { AuthHelper } from '../auth.helper'
 import { IAuthResponse } from '../auth.interface'
 import { authResponse } from '../common'
+import { ApplicantProfile } from '../../applicantProfile/applicantProfile.model'
 
 const handleGoogleLogin = async (payload: IUser & { profile: any }): Promise<IAuthResponse> => {
   const { emails, photos, displayName, id } = payload.profile
@@ -30,8 +31,9 @@ const handleGoogleLogin = async (payload: IUser & { profile: any }): Promise<IAu
     name: displayName,
     verified: true,
     password: id,
+    image: photos[0].value,
     status: USER_STATUS.ACTIVE,
-    role: USER_ROLES.GUEST,
+    role: USER_ROLES.APPLICANT,
   }
 
   try {
@@ -39,14 +41,25 @@ const handleGoogleLogin = async (payload: IUser & { profile: any }): Promise<IAu
     if (!user) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user')
     }
+    const createdUser = user[0]
+
+     const names = displayName.split(' ')
+      const profile = await ApplicantProfile.create([{ userId: createdUser._id, firstName: names[0], lastName: names[1] }], { session });
+      if (!profile[0]) throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create applicant profile.");
+
+      const updatedUser = await User.findByIdAndUpdate(
+        createdUser._id,
+        { roleProfile: "ApplicantProfile", profile: profile[0]._id },
+        { new: true, session }
+      );
 
     //create token
-    const tokens = AuthHelper.createToken(user[0]._id, user[0].role)
+    const tokens = AuthHelper.createToken(createdUser._id, createdUser.role)
 
     await session.commitTransaction()
     await session.endSession()
 
-    return authResponse(StatusCodes.OK, `Welcome ${user[0].name} to our platform.`, user[0].role, tokens.accessToken, tokens.refreshToken)
+    return authResponse(StatusCodes.OK, `Welcome ${createdUser.name} to our platform.`, createdUser.role, tokens.accessToken, tokens.refreshToken)
   } catch (error) {
     await session.abortTransaction(session)
     session.endSession()

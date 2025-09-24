@@ -25,9 +25,11 @@ router.patch(
     try {
       const resume = getSingleFilePath(req.files, "resume");
       const companyLogo = getSingleFilePath(req.files, "companyLogo");
+      const image = getSingleFilePath(req.files, "image");
       req.body = {
         resume,
         companyLogo,
+        image,
         ...req.body
       };
       next();

@@ -75,9 +75,9 @@ const fileUploadHandler = () => {
       }
     } else if (file.fieldname === 'companyLogo') {
       if (
-        file.mimetype === 'companyLogo/jpeg' ||
-        file.mimetype === 'companyLogo/png' ||
-        file.mimetype === 'companyLogo/jpg'
+        file.mimetype === 'image/jpeg' ||
+        file.mimetype === 'image/png' ||
+        file.mimetype === 'image/jpg'
       ) {
         cb(null, true)
       } else {

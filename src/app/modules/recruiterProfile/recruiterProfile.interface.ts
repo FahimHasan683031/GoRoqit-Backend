@@ -8,6 +8,12 @@ export type IRecruiterProfile = {
   companyDescription?: string
   companyLogo?: string
   phone?: string
+  companyEmail?: string
+  location:string
+  linkedinProfile?: string
+  twitterProfile?: string
+  facebookProfile?: string
+  instagramProfile?: string
   bio?: string
   createdAt: Date
   updatedAt: Date

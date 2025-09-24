@@ -6,9 +6,10 @@ export const educationSchema = z.object({
   instituteName: z.string().min(1, "Institute name is required"),
   major: z.string().optional(),
   result: z.string().optional(),
-  grade: z.string().optional(),
-  startDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().optional(),
+  scale: z.string().optional(),
+  duration: z.string().optional(),
+  yearOfPassing: z.number().optional(),
+  cgpa: z.number().optional(),
 });
 
 // Work Experience Schema
@@ -21,7 +22,7 @@ export const workExperienceSchema = z.object({
     .optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
-  duration: z.string().optional(),
+  experience: z.string().optional(),
 });
 
 // Applicant Data Schema
@@ -36,6 +37,23 @@ export const applicantDataSchema = z.object({
   languages: z.array(z.string()).default([]),
   salaryExpectation: z.string().optional(),
   openToWork: z.boolean().default(false),
+  middleName: z.string().max(50).trim().optional(),
+  preferredName: z.string().max(50).trim().optional(),
+  gender: z.enum(["Male", "Female", "Other"]).optional(),
+  maritalStatus: z
+    .enum(["Single", "Married", "Divorced", "Widowed"])
+    .optional(),
+  citizenship: z.string().optional(),
+  dateOfBirth: z.coerce.date().optional(),
+  age: z.number().optional(),
+  previousEmployment: z.enum(["Yes", "No"]).optional(),
+  compiteAddrase: z.string().optional(),
+  country: z.string().optional(),
+  city: z.string().optional(),
+  zipCode: z.string().optional(),
+  province: z.string().optional(),
+  mobile: z.string().optional(),
+  landLine: z.string().optional(),
 });
 
 // Applicant Profile Create Schema
@@ -46,6 +64,23 @@ export const applicantProfileCreateSchema = z.object({
     phone: z.string().trim().optional(),
     bio: z.string().max(500).optional(),
     applicantData: applicantDataSchema.optional(),
+    middleName: z.string().max(50).trim().optional(),
+    preferredName: z.string().max(50).trim().optional(),
+    gender: z.enum(["Male", "Female", "Other"]).optional(),
+    maritalStatus: z
+      .enum(["Single", "Married", "Divorced", "Widowed"])
+      .optional(),
+    citizenship: z.string().optional(),
+    dateOfBirth: z.coerce.date().optional(),
+    age: z.number().optional(),
+    previousEmployment: z.enum(["Yes", "No"]).optional(),
+    compiteAddrase: z.string().optional(),
+    country: z.string().optional(),
+    city: z.string().optional(),
+    zipCode: z.string().optional(),
+    province: z.string().optional(),
+    mobile: z.string().optional(),
+    landLine: z.string().optional(),
   })
 });
 
@@ -66,6 +101,23 @@ export const applicantProfileUpdateSchema = z.object({
     languages: z.array(z.string()).optional(),
     salaryExpectation: z.string().optional(),
     openToWork: z.boolean().optional(),
+    middleName: z.string().max(50).trim().optional(),
+    preferredName: z.string().max(50).trim().optional(),
+    gender: z.enum(["Male", "Female", "Other"]).optional(),
+    maritalStatus: z
+      .enum(["Single", "Married", "Divorced", "Widowed"])
+      .optional(),
+    citizenship: z.string().optional(),
+    dateOfBirth: z.coerce.date().optional(),
+    age: z.number().optional(),
+    previousEmployment: z.enum(["Yes", "No"]).optional(),
+    compiteAddrase: z.string().optional(),
+    country: z.string().optional(),
+    city: z.string().optional(),
+    zipCode: z.string().optional(),
+    province: z.string().optional(),
+    mobile: z.string().optional(),
+    landLine: z.string().optional(),
   })
 });
 

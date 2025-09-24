@@ -117,7 +117,7 @@ export const updateProfile = async (payload: IUpdateProfilePayload) => {
     { _id: payload.authId, status: { $ne: USER_STATUS.DELETED } },
     {
       ...(payload.name && { name: payload.name }),
-      ...(payload.phone && { phone: payload.phone }),
+      ...(payload.image && { image: payload.image }),
     },
     { new: true }
   );
@@ -142,6 +142,19 @@ export const updateProfile = async (payload: IUpdateProfilePayload) => {
         ...(payload.salaryExpectation && { salaryExpectation: payload.salaryExpectation }),
         ...(payload.openToWork !== undefined && { openToWork: payload.openToWork }),
         ...(payload.bio && { bio: payload.bio }),
+        ...(payload.middleName && { middleName: payload.middleName }),
+        ...(payload.preferredName && { preferredName: payload.preferredName }),
+        ...(payload.gender && { gender: payload.gender }),
+        ...(payload.maritalStatus && { maritalStatus: payload.maritalStatus }),
+        ...(payload.citizenship && { citizenship: payload.citizenship }),
+        ...(payload.dateOfBirth && { dateOfBirth: payload.dateOfBirth }),
+        ...(payload.age && { age: payload.age }),
+        ...(payload.previousEmployment && { previousEmployment: payload.previousEmployment }),
+        ...(payload.compiteAddrase && { compiteAddrase: payload.compiteAddrase }),
+        ...(payload.country && { country: payload.country }),
+        ...(payload.city && { city: payload.city }),
+        ...(payload.zipCode && { zipCode: payload.zipCode }),
+
       },
       { new: true }
     );
@@ -149,12 +162,16 @@ export const updateProfile = async (payload: IUpdateProfilePayload) => {
     await RecruiterProfile.findByIdAndUpdate(
       user.profile,
       {
-        ...(payload.firstName && { firstName: payload.firstName }),
-        ...(payload.lastName && { lastName: payload.lastName }),
         ...(payload.companyName && { companyName: payload.companyName }),
         ...(payload.companyWebsite && { companyWebsite: payload.companyWebsite }),
         ...(payload.companyDescription && { companyDescription: payload.companyDescription }),
-        ...(payload.bio && { bio: payload.bio }),
+        ...(payload.companyLogo && { companyLogo: payload.companyLogo }),
+        ...(payload.companyEmail && { companyEmail: payload.companyEmail }),
+        ...(payload.location && { location: payload.location }),
+        ...(payload.linkedinProfile && { linkedinProfile: payload.linkedinProfile }),
+        ...(payload.twitterProfile && { twitterProfile: payload.twitterProfile }),
+        ...(payload.facebookProfile && { facebookProfile: payload.facebookProfile }),
+        ...(payload.instagramProfile && { instagramProfile: payload.instagramProfile }),
       },
       { new: true }
     );

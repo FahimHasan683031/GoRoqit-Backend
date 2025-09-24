@@ -66,6 +66,7 @@ export const createUser = async (payload: IUser) => {
     if (!user[0]) throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create user.");
 
     const createdUser = user[0];
+    let updatedUser: IUser | null = null;
 
     // 5. Create Role-based Profile
     if (payload.role === USER_ROLES.APPLICANT) {
@@ -73,26 +74,25 @@ export const createUser = async (payload: IUser) => {
       const profile = await ApplicantProfile.create([{ userId: createdUser._id, firstName: names[0], lastName: names[1] }], { session });
       if (!profile[0]) throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create applicant profile.");
 
-      await User.findByIdAndUpdate(
+      updatedUser = await User.findByIdAndUpdate(
         createdUser._id,
         { roleProfile: "ApplicantProfile", profile: profile[0]._id },
-        { session }
+        { new: true, session }
       );
     } else if (payload.role === USER_ROLES.RECRUITER) {
       const profile = await RecruiterProfile.create([{ userId: createdUser._id, companyName: payload.companyName! }], { session });
       if (!profile[0]) throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create recruiter profile.");
 
-      await User.findByIdAndUpdate(
+       updatedUser = await User.findByIdAndUpdate(
         createdUser._id,
         { roleProfile: "RecruiterProfile", profile: profile[0]._id },
-        { session }
+        { new: true, session }
       );
     }
 
     // 6. Commit Transaction
     await session.commitTransaction();
-    return "Account created successfully.";
-
+    return updatedUser;
   } catch (error) {
     // Rollback on error
     await session.abortTransaction();
