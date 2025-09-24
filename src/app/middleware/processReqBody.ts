@@ -6,7 +6,7 @@ import path from 'path'
 import fs from 'fs'
 import sharp from 'sharp'
 
-type IFolderName = 'images' | 'media' | 'documents'
+type IFolderName = 'images' | 'media' | 'documents' 
 interface ProcessedFiles {
   [key: string]: string | string[] | undefined
 }

@@ -13,7 +13,8 @@ router.get(
   auth(
     USER_ROLES.ADMIN,
     USER_ROLES.RECRUITER,
-    USER_ROLES.APPLICANT
+    USER_ROLES.APPLICANT,
+    USER_ROLES.GUEST
   ),
   ApplicationController.getAllApplications
 );
@@ -23,7 +24,8 @@ router.get(
   auth(
     USER_ROLES.RECRUITER,
     USER_ROLES.ADMIN,
-    USER_ROLES.APPLICANT
+    USER_ROLES.APPLICANT,
+    USER_ROLES.GUEST
   ),
   ApplicationController.getSingleApplication
 );
@@ -31,7 +33,8 @@ router.get(
 router.post(
   '/',
   auth(
-    USER_ROLES.APPLICANT
+    USER_ROLES.APPLICANT,
+    USER_ROLES.GUEST
   ),
   
   validateRequest(ApplicationValidations.create),
@@ -41,7 +44,8 @@ router.post(
 router.patch(
   '/:id',
   auth(
-    USER_ROLES.APPLICANT
+    USER_ROLES.APPLICANT,
+    USER_ROLES.GUEST
   ),
   
   validateRequest(ApplicationValidations.update),

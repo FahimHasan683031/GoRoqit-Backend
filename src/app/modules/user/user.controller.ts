@@ -5,17 +5,21 @@ import sendResponse from '../../../shared/sendResponse'
 import { UserServices } from './user.service'
 import { IUser } from './user.interface'
 import config from '../../../config'
+import { JwtPayload } from 'jsonwebtoken'
 
+
+
+// Update Profile
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
   const { image, ...userData } = req.body
 
-  image && (userData.profile = image[0])
-  const result = await UserServices.updateProfile(req.user!, userData)
-  sendResponse<String>(res, {
+  image && (userData.image = image[0])
+  const result = await UserServices.updateProfile({ authId: (req.user! as JwtPayload).authId!, ...userData })
+  sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: 'Profile updated successfully',
-    data: result,
+    data: {result},
   })
 })
 

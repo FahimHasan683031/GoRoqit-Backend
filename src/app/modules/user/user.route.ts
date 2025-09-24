@@ -7,6 +7,8 @@ import {
   fileAndBodyProcessorUsingDiskStorage,
 } from '../../middleware/processReqBody'
 import { UserValidations } from './user.validation'
+import fileUploadHandler from '../../middleware/fileUploadHandler'
+import { getSingleFilePath } from '../../../shared/getFilePath'
 
 const router = express.Router()
 
@@ -18,7 +20,21 @@ router.patch(
     USER_ROLES.ADMIN,
     USER_ROLES.RECRUITER,
   ),
-  fileAndBodyProcessorUsingDiskStorage(),
+   fileUploadHandler(),
+  async (req, res, next) => {
+    try {
+      const resume = getSingleFilePath(req.files, "resume");
+      const companyLogo = getSingleFilePath(req.files, "companyLogo");
+      req.body = {
+        resume,
+        companyLogo,
+        ...req.body
+      };
+      next();
+    } catch (error) {
+      res.status(400).json({ message: "Failed to upload Category Image" });
+    }
+  },
   validateRequest(UserValidations.userUpdateSchema),
   UserController.updateProfile,
 )

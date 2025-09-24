@@ -1,7 +1,4 @@
 import { Types } from "mongoose";
-import { USER_ROLES } from "../user/user.interface";
-
-
 
 export type IEducation = {
   degreeTitle: string;
@@ -23,41 +20,21 @@ export type IWorkExperience = {
   duration?: string;
 };
 
-export type IApplicantData = {
+export type IApplicantProfile = {
+  _id: Types.ObjectId;
+  userId: Types.ObjectId;
   resume?: string;
-  skills: string[];
-  education: IEducation[];
-  workExperience: IWorkExperience[];
+  skills?: string[];
+  education?: IEducation[];
+  workExperience?: IWorkExperience[];
   preferredWorkType?: "Full-time" | "Part-time" | "Contract" | "Internship" | "Other";
   languages?: string[];
   salaryExpectation?: string;
   openToWork: boolean;
-};
-
-export type IRecruiterData = {
-  companyName: string;
-  companyWebsite?: string;
-  companyDescription?: string;
-  companyLogo?: string;
-};
-
-export type IAdminData = {
-  permissions: string[];
-};
-
-export type IProfile = {
-  _id: Types.ObjectId;
-  userId: Types.ObjectId;
-  role: USER_ROLES;
-  firstName: string;
+  firstName?: string;
   lastName?: string;
-  image?: string;
   phone?: string;
-  bio?: string;  
-  // Role-specific data
-  applicantData?: IApplicantData;
-  recruiterData?: IRecruiterData;
-  adminData?: IAdminData;
+  bio?: string;
   createdAt: Date;
   updatedAt: Date;
 };

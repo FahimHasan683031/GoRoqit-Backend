@@ -6,6 +6,8 @@ export const userSignupSchema = z.object({
   email: z.string().email().toLowerCase().trim(),
   name: z.string(),
   companyName: z.string().optional(),
+  role: z.nativeEnum(USER_ROLES),
+  image: z.string().optional(),
   password: z.string().min(8),
  })
 });

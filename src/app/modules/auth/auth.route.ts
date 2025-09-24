@@ -7,11 +7,26 @@ import { AuthValidations } from './auth.validation'
 import { USER_ROLES } from '../../../enum/user'
 import auth, { tempAuth } from '../../middleware/auth'
 import { UserValidations } from '../user/user.validation'
+import fileUploadHandler from '../../middleware/fileUploadHandler'
+import { getSingleFilePath } from '../../../shared/getFilePath'
 
 const router = express.Router()
 
 router.post(
   '/signup',
+   fileUploadHandler(),
+  async (req, res, next) => {
+    try {
+      const image = getSingleFilePath(req.files, "image");
+      req.body = {
+        image,
+        ...req.body
+      };
+      next();
+    } catch (error) {
+      res.status(400).json({ message: "Failed to upload Category Image" });
+    }
+  },
   validateRequest(UserValidations.userSignupSchema),
   CustomAuthController.createUser,
 )

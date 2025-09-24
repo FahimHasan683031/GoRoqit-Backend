@@ -6,9 +6,18 @@ import { JwtPayload } from 'jsonwebtoken'
 import { jobSearchableFields } from './job.constants'
 import { Types } from 'mongoose'
 import QueryBuilder from '../../builder/QueryBuilder'
+import { Category } from '../category/category.model'
 
 const createJob = async (user: JwtPayload, payload: IJob): Promise<IJob> => {
   try {
+    const checkCategory = await Category.findOne({ name: payload.category })
+    if (!checkCategory) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Category not found, please try again with valid category name.',
+      )
+    }
+
     const result = await Job.create({ ...payload, user: user.authId })
     if (!result) {
       throw new ApiError(
@@ -42,7 +51,7 @@ const getSingleJob = async (id: string): Promise<IJob> => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Job ID')
   }
 
-  const result = await Job.findById(id).populate('user');
+  const result = await Job.findById(id).populate('user')
   if (!result) {
     throw new ApiError(
       StatusCodes.NOT_FOUND,

@@ -1,4 +1,5 @@
 import { Model, Types } from "mongoose";
+import { IEducation, IWorkExperience } from "../profile/profile.interface";
 
 export enum USER_ROLES {
   ADMIN = "admin",
@@ -34,12 +35,38 @@ export type IUser = {
   verified: boolean;
   role: USER_ROLES;
   companyName?: string;
+  image?: string;
   authentication: IAuthentication;
-  profile?: Types.ObjectId;
+  profile?: Types.ObjectId | null;
+  roleProfile?: 'ApplicantProfile' | 'RecruiterProfile' | null;
   createdAt: Date;
   updatedAt: Date;
   subscribe?: boolean;
 };
+
+
+
+export interface IUpdateProfilePayload {
+  authId: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  firstName?: string;
+  lastName?: string;
+  resume?: string;
+  skills?: string[];
+  education?: IEducation[]; 
+  workExperience?: IWorkExperience[];
+  preferredWorkType?: "Full-time" | "Part-time" | "Contract" | "Internship" | "Other";
+  languages?: string[];
+  salaryExpectation?: string;
+  openToWork?: boolean;
+  bio?: string;
+  companyName?: string;
+  companyWebsite?: string;
+  companyDescription?: string;
+  companyLogo?: string;
+}
 
 export type UserModel = {
   isPasswordMatched: (givenPassword: string, savedPassword: string) => Promise<boolean>;

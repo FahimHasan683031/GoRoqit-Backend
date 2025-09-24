@@ -32,7 +32,8 @@ router.post(
   auth(
      USER_ROLES.ADMIN,
     USER_ROLES.RECRUITER,
-    USER_ROLES.APPLICANT
+    USER_ROLES.APPLICANT,
+    USER_ROLES.GUEST
   ),
   validateJobCreation,
   validateRequest(JobValidations.createJobZodSchema),

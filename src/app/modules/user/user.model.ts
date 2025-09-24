@@ -35,15 +35,23 @@ const UserSchema = new Schema<IUser, UserModel>(
     role: {
       type: String,
       enum: Object.values(USER_ROLES),
-      default: USER_ROLES.GUEST,
     },
     name: {
       type: String,
       default: null,
     },
+    image: {
+      type: String,
+      default: null,
+    },
     profile: {
       type: Schema.Types.ObjectId,
-      ref: "Profile",
+      refPath: "roleProfile",
+      default: null,
+    },
+    roleProfile: {
+      type: String,
+      enum: ["ApplicantProfile", "RecruiterProfile", null],
       default: null,
     },
     companyName: {
@@ -66,6 +74,7 @@ const UserSchema = new Schema<IUser, UserModel>(
           type: Number,
           default: 0,
         },
+       
         passwordChangedAt: {
           type: Date,
           default: null,

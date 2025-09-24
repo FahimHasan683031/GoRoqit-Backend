@@ -15,59 +15,92 @@ import { jwtHelper } from '../../../../helpers/jwtHelper'
 import { JwtPayload } from 'jsonwebtoken'
 import { IUser } from '../../user/user.interface'
 import { emailHelper } from '../../../../helpers/emailHelper'
+import { ApplicantProfile } from '../../applicantProfile/applicantProfile.model'
+import { RecruiterProfile } from '../../recruiterProfile/recruiterProfile.model'
+import mongoose from 'mongoose'
 
 
+export const createUser = async (payload: IUser) => {
+  payload.email = payload.email?.toLowerCase().trim();
+  const session = await mongoose.startSession();
 
-const createUser = async (payload: IUser) => {
-  payload.email = payload.email?.toLowerCase().trim()
-  const isUserExist = await User.findOne({
-    email: payload.email,
-    status: { $nin: [USER_STATUS.DELETED] },
-  })
+  try {
+    session.startTransaction();
 
-  if (isUserExist) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      `An account with this email already exist, please login or try with another email.`,
-    )
+    // 1. Check if user already exists
+    const isUserExist = await User.findOne({
+      email: payload.email,
+      status: { $nin: [USER_STATUS.DELETED] },
+    }).session(session);
+
+    if (isUserExist) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        `An account with this email already exists.`
+      );
+    }
+
+    // 2. Generate OTP
+    const otp = generateOtp();
+    const otpExpiresIn = new Date(Date.now() + 5 * 60 * 1000);
+
+    const authentication = {
+      email: payload.email,
+      oneTimeCode: otp,
+      expiresAt: otpExpiresIn,
+      latestRequestAt: new Date(),
+      requestCount: 1,
+      authType: 'createAccount',
+    };
+
+    // 3. Send OTP email
+    const createAccountEmail = emailTemplate.createAccount({
+      name: payload.name!,
+      email: payload.email,
+      otp,
+    });
+    await emailHelper.sendEmail(createAccountEmail);
+
+    // 4. Create User
+    const user = await User.create([{ ...payload, password: payload.password, authentication }], { session });
+    if (!user[0]) throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create user.");
+
+    const createdUser = user[0];
+
+    // 5. Create Role-based Profile
+    if (payload.role === USER_ROLES.APPLICANT) {
+      const names = payload.name.split(' ')
+      const profile = await ApplicantProfile.create([{ userId: createdUser._id, firstName: names[0], lastName: names[1] }], { session });
+      if (!profile[0]) throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create applicant profile.");
+
+      await User.findByIdAndUpdate(
+        createdUser._id,
+        { roleProfile: "ApplicantProfile", profile: profile[0]._id },
+        { session }
+      );
+    } else if (payload.role === USER_ROLES.RECRUITER) {
+      const profile = await RecruiterProfile.create([{ userId: createdUser._id, companyName: payload.companyName! }], { session });
+      if (!profile[0]) throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create recruiter profile.");
+
+      await User.findByIdAndUpdate(
+        createdUser._id,
+        { roleProfile: "RecruiterProfile", profile: profile[0]._id },
+        { session }
+      );
+    }
+
+    // 6. Commit Transaction
+    await session.commitTransaction();
+    return "Account created successfully.";
+
+  } catch (error) {
+    // Rollback on error
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession(); // Always end session
   }
-
-  const otp = generateOtp()
-  const otpExpiresIn = new Date(Date.now() + 5 * 60 * 1000)
-
-  const authentication = {
-    email: payload.email,
-    oneTimeCode: otp,
-    expiresAt: otpExpiresIn,
-    latestRequestAt: new Date(),
-    requestCount: 1,
-    authType: 'createAccount',
-  }
-
-  //send email or sms with otp
-  const createAccount = emailTemplate.createAccount({
-    name: payload.name!,
-    email: payload.email!.toLowerCase().trim(),
-    otp,
-  })
-
-
-  await emailHelper.sendEmail(createAccount)
-
-  const user = await User.create({
-    ...payload,
-    password: payload.password,
-    authentication,
-  })
-
-  if(!user){
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user.')
-  }
-  // emailQueue.add('emails', createAccount)
-
-  return "Account created successfully."
-}
-
+};
 
 
 const customLogin = async (payload: ILoginData):Promise<IAuthResponse> => {

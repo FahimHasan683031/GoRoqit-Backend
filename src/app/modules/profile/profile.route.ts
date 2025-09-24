@@ -12,7 +12,7 @@ router.post(
   '/',
   auth(USER_ROLES.APPLICANT, USER_ROLES.ADMIN, USER_ROLES.RECRUITER),
   fileAndBodyProcessorUsingDiskStorage(),
-  validateRequest(profileValidations.updateProfile),
+  validateRequest(profileValidations.createProfile),
   profileControllers.createProfile,
 )
 
@@ -25,6 +25,13 @@ router.get(
     '/',
     auth(USER_ROLES.APPLICANT, USER_ROLES.ADMIN, USER_ROLES.RECRUITER),
     profileControllers.getProfile,
+  )
+  router.patch(
+    '/',
+    auth(USER_ROLES.APPLICANT, USER_ROLES.ADMIN, USER_ROLES.RECRUITER),
+    fileAndBodyProcessorUsingDiskStorage(),
+    validateRequest(profileValidations.updateProfile),
+    profileControllers.updateProfile,
   )
 
 export const ProfileRoutes = router
