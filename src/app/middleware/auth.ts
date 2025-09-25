@@ -62,7 +62,7 @@ export const tempAuth =
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const tokenWithBearer = req.headers.authorization
-
+      console.log('tempAuth tokenWithBearer', req.headers.authorization)
       if (!tokenWithBearer) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'Token not found!')
       }

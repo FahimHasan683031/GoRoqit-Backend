@@ -11,8 +11,7 @@ import { JwtPayload } from 'jsonwebtoken'
 
 // Update Profile
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
-
-  const result = await UserServices.updateProfile({ authId: (req.user! as JwtPayload).authId!, ...req.body })
+  const result = await UserServices.updateProfile(req.user! as JwtPayload, req.body)
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -74,6 +73,17 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+// get profile
+const getProfile = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserServices.getProfile(req.user! as JwtPayload)
+  sendResponse<IUser>(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Profile fetched successfully',
+    data: result,
+  })
+})
+
 
 
 export const UserController = {
@@ -81,5 +91,6 @@ export const UserController = {
   updateProfile,
   getSingleUser,
   deleteUser,
-  updateUserRoleAndCreateProfile
+  updateUserRoleAndCreateProfile,
+  getProfile,
 }

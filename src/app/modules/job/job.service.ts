@@ -36,14 +36,19 @@ const createJob = async (user: JwtPayload, payload: IJob): Promise<IJob> => {
 }
 
 const getAllJobs = async (query: Record<string, unknown>) => {
-  const jobQuery = new QueryBuilder(Job.find(), query)
+  const jobQueryBuilder = new QueryBuilder(Job.find(), query)
     .filter()
     .search(jobSearchableFields)
     .sort()
-    .paginate()
     .fields()
-  const jobs = await jobQuery.modelQuery
-  return jobs
+    .paginate()
+  
+  const jobs = await jobQueryBuilder.modelQuery
+  const paginationInfo = await jobQueryBuilder.getPaginationInfo()
+  return {
+    data: jobs,
+    meta: paginationInfo
+  }
 }
 
 const getSingleJob = async (id: string): Promise<IJob> => {

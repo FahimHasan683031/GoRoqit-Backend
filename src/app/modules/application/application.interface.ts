@@ -3,7 +3,8 @@ import { Model, Types } from 'mongoose'
 export interface IApplication {
   _id: Types.ObjectId
   job: Types.ObjectId
-  user: Types.ObjectId
+  applicant: Types.ObjectId
+  author: Types.ObjectId
   name: string
   title: string
   location: string

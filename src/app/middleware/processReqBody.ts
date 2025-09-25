@@ -6,16 +6,18 @@ import path from 'path'
 import fs from 'fs'
 import sharp from 'sharp'
 
-type IFolderName = 'images' | 'media' | 'documents' 
+type IFolderName = 'image' | 'media' | 'documents' | 'resume' | "companyLogo"
 interface ProcessedFiles {
   [key: string]: string | string[] | undefined
 }
 
 // Define upload configuration with maxCount information
 const uploadFields = [
-  { name: 'images', maxCount: 5 },
+  { name: 'image', maxCount: 5 },
   { name: 'media', maxCount: 3 },
   { name: 'documents', maxCount: 3 },
+  { name: 'resume', maxCount: 1 },
+  { name: 'companyLogo', maxCount: 1 },
 ] as const
 
 export const fileAndBodyProcessor = () => {
@@ -29,7 +31,9 @@ export const fileAndBodyProcessor = () => {
   ) => {
     try {
       const allowedTypes = {
-        images: ['image/jpeg', 'image/png', 'image/jpg'],
+        image: ['image/jpeg', 'image/png', 'image/jpg'],
+        resume: ['application/pdf'],
+        companyLogo: ['image/jpeg', 'image/png', 'image/jpg'],
         media: ['video/mp4', 'audio/mpeg'],
         documents: ['application/pdf'],
       }
@@ -171,9 +175,11 @@ export const fileAndBodyProcessorUsingDiskStorage = () => {
   ) => {
     try {
       const allowedTypes = {
-        images: ['image/jpeg', 'image/png', 'image/jpg'],
+        image: ['image/jpeg', 'image/png', 'image/jpg'],
         media: ['video/mp4', 'audio/mpeg'],
         documents: ['application/pdf'],
+        resume: ['application/pdf'],
+        companyLogo: ['image/jpeg', 'image/png', 'image/jpg'],
       }
 
       const fieldType = file.fieldname as IFolderName
@@ -268,7 +274,8 @@ export const fileAndBodyProcessorUsingDiskStorage = () => {
             }
 
             // Store as array or single value based on maxCount
-            processedFiles[fieldName] = maxCount > 1 ? paths : paths[0]
+            // processedFiles[fieldName] = maxCount > 1 ? paths : paths[0]
+            processedFiles[fieldName] = paths.join(',')
           }
 
           req.body = { ...req.body, ...processedFiles }

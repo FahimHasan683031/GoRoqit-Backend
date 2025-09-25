@@ -111,10 +111,20 @@ const deleteUser = async (id: string) => {
 }
 
 
-export const updateProfile = async (payload: IUpdateProfilePayload) => {
+export const updateProfile = async (user:JwtPayload, payload: IUpdateProfilePayload) => {
+ 
+  const isExistUser = await User.findById(user.authId)
+
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "User not found or deleted.");
+  }
+  if (user.role !== isExistUser.role) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "you dont have permission to update profile.");
+  }
+  
   // 1. Update User basic fields (NO EMAIL update allowed)
-  const user = await User.findOneAndUpdate(
-    { _id: payload.authId, status: { $ne: USER_STATUS.DELETED } },
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: user.authId, status: { $ne: USER_STATUS.DELETED } },
     {
       ...(payload.name && { name: payload.name }),
       ...(payload.image && { image: payload.image }),
@@ -122,14 +132,11 @@ export const updateProfile = async (payload: IUpdateProfilePayload) => {
     { new: true }
   );
 
-  if (!user) {
-    throw new ApiError(StatusCodes.NOT_FOUND, "User not found or deleted.");
-  }
-
+  
   // 2. Update role-based profile
-  if (user.role === USER_ROLES.APPLICANT && user.profile) {
+  if (isExistUser.role === USER_ROLES.APPLICANT && isExistUser.profile) {
     await ApplicantProfile.findByIdAndUpdate(
-      user.profile,
+      isExistUser.profile,
       {
         ...(payload.firstName && { firstName: payload.firstName }),
         ...(payload.lastName && { lastName: payload.lastName }),
@@ -138,7 +145,7 @@ export const updateProfile = async (payload: IUpdateProfilePayload) => {
         ...(payload.education && { education: payload.education }),
         ...(payload.workExperience && { workExperience: payload.workExperience }),
         ...(payload.preferredWorkType && { preferredWorkType: payload.preferredWorkType }),
-        ...(payload.languages && { languages: payload.languages }),
+        ...(payload.languages && { languages: payload.languages }),  
         ...(payload.salaryExpectation && { salaryExpectation: payload.salaryExpectation }),
         ...(payload.openToWork !== undefined && { openToWork: payload.openToWork }),
         ...(payload.bio && { bio: payload.bio }),
@@ -158,9 +165,10 @@ export const updateProfile = async (payload: IUpdateProfilePayload) => {
       },
       { new: true }
     );
-  } else if (user.role === USER_ROLES.RECRUITER && user.profile) {
+    return "Profile updated successfully.";
+  } else if (isExistUser.role === USER_ROLES.RECRUITER && isExistUser.profile) {
     await RecruiterProfile.findByIdAndUpdate(
-      user.profile,
+      isExistUser.profile,
       {
         ...(payload.companyName && { companyName: payload.companyName }),
         ...(payload.companyWebsite && { companyWebsite: payload.companyWebsite }),
@@ -175,10 +183,20 @@ export const updateProfile = async (payload: IUpdateProfilePayload) => {
       },
       { new: true }
     );
+    return "Profile updated successfully.";
+  }else{
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Something went wrong.");
   }
-
-  return "Profile updated successfully.";
 };
+
+const getProfile = async(user:JwtPayload) => {
+  console.log('getProfile user', user)
+  const isExistUser = await User.findById(user.authId).populate('profile').lean()
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "The requested profile not found or deleted.");
+  }
+  return isExistUser
+}
 
 
 export const UserServices = {
@@ -188,4 +206,5 @@ export const UserServices = {
   getAllUser,
   getSingleUser,
   deleteUser,
+  getProfile,
 }

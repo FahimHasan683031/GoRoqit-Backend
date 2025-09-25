@@ -6,6 +6,7 @@ import { JwtPayload } from 'jsonwebtoken'
 import mongoose, { Types } from 'mongoose'
 import QueryBuilder from '../../builder/QueryBuilder'
 import { Job } from '../job/job.model'
+import { USER_ROLES } from '../user/user.interface'
 
 export const createApplication = async (
   user: JwtPayload,
@@ -20,9 +21,26 @@ export const createApplication = async (
     if (!job) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Job doesn't exist!")
     }
+    if (user.role !== USER_ROLES.APPLICANT) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Only Applicants can apply for jobs',
+      )
+    }
+    const alreadyApplied = await Application.findOne({
+      job: job._id,
+      applicant: user.authId,
+    })
+
+    if (alreadyApplied) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'You have already applied for this job',
+      )
+    }
 
     const createdApplication = await Application.create(
-      [{ ...payload, user: user.authId }],
+      [{ ...payload, applicant: user.authId, author: job.user }],
       { session },
     )
 
@@ -68,16 +86,24 @@ const getAllApplications = async (
   user: JwtPayload,
   query: Record<string, unknown>,
 ) => {
-  const applicationQuery = new QueryBuilder(
-    Application.find({ user: user.authId }),
-    query,
-  )
+  if (user.role === USER_ROLES.APPLICANT) {
+    query.applicant = user.authId
+  }
+  if (user.role === USER_ROLES.RECRUITER) {
+    query.author = user.authId
+  }
+  console.log('query', query)
+  const applicationQuery = new QueryBuilder(Application.find(), query)
     .filter()
     .sort()
     .paginate()
     .fields()
-  const jobs = await applicationQuery.modelQuery
-  return jobs
+  const applications = await applicationQuery.modelQuery
+  const paginationInfo = await applicationQuery.getPaginationInfo()
+  return {
+    data: applications,
+    meta:paginationInfo,
+  }
 }
 
 const getSingleApplication = async (id: string): Promise<IApplication> => {
@@ -85,7 +111,7 @@ const getSingleApplication = async (id: string): Promise<IApplication> => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Application ID')
   }
 
-  const result = await Application.findById(id).populate('job').populate('user')
+  const result = await Application.findById(id).populate(['job', 'applicant'])
   if (!result) {
     throw new ApiError(
       StatusCodes.NOT_FOUND,

@@ -13,7 +13,6 @@ router.route("/")
         createCategoryController
     )
     .get(
-         auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER,USER_ROLES.GUEST),
         getCategoriesController
     )
 

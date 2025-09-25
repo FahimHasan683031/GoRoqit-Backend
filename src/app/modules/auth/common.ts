@@ -87,30 +87,37 @@ const handleLoginLogic = async (payload: ILoginData, isUserExist: IUser):Promise
   )
 
   if (!isPasswordMatched) {
-    isUserExist.authentication.wrongLoginAttempts = wrongLoginAttempts + 1
-
-    if (isUserExist.authentication.wrongLoginAttempts >= 5) {
-      isUserExist.status = USER_STATUS.RESTRICTED
-      isUserExist.authentication.restrictionLeftAt = new Date(
-        Date.now() + 10 * 60 * 1000,
-      ) // restriction for 10 minutes
-    }
-
-    await User.findByIdAndUpdate(isUserExist._id, {
-      $set: {
-        status: isUserExist.status,
-        authentication: {
-          restrictionLeftAt: isUserExist.authentication.restrictionLeftAt,
-          wrongLoginAttempts: isUserExist.authentication.wrongLoginAttempts,
-        },
-      },
-    })
-
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
       'Incorrect password, please try again.',
     )
   }
+
+  // if (!isPasswordMatched) {
+  //   isUserExist.authentication.wrongLoginAttempts = wrongLoginAttempts + 1
+
+  //   if (isUserExist.authentication.wrongLoginAttempts >= 5) {
+  //     isUserExist.status = USER_STATUS.RESTRICTED
+  //     isUserExist.authentication.restrictionLeftAt = new Date(
+  //       Date.now() + 10 * 60 * 1000,
+  //     ) // restriction for 10 minutes
+  //   }
+
+  //   await User.findByIdAndUpdate(isUserExist._id, {
+  //     $set: {
+  //       status: isUserExist.status,
+  //       authentication: {
+  //         restrictionLeftAt: isUserExist.authentication.restrictionLeftAt,
+  //         wrongLoginAttempts: isUserExist.authentication.wrongLoginAttempts,
+  //       },
+  //     },
+  //   })
+
+  //   throw new ApiError(
+  //     StatusCodes.BAD_REQUEST,
+  //     'Incorrect password, please try again.',
+  //   )
+  // }
 
   await User.findByIdAndUpdate(
     isUserExist._id,
