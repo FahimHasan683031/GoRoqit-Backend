@@ -11,6 +11,9 @@ import unlinkFile from '../../../shared/unlinkFile'
 const sendMessageToDB = async (payload: any): Promise<IMessage> => {
   // save to DB
   const response = await Message.create(payload)
+  if (!response) {
+    throw new Error('Message not created')
+  }
 
   //@ts-ignore
   const io = global.io
@@ -29,6 +32,13 @@ const getMessageFromDB = async (
   query: Record<string, any>,
 ): Promise<{ messages: IMessage[]; pagination: any; participant: any }> => {
   checkMongooseIDValidation(id, 'Chat')
+  const isExistChat = await Chat.findById(id)
+  if (!isExistChat) {
+    throw new Error('Chat not found')
+  }
+  if (!isExistChat.participants.includes(user.authId)) {
+    throw new Error('You are not participant of this chat')
+  }
 
   const result = new QueryBuilder(
     Message.find({ chatId: id }).sort({ createdAt: 1 }),
@@ -39,7 +49,7 @@ const getMessageFromDB = async (
 
   const participant = await Chat.findById(id).populate({
     path: 'participants',
-    select: '-_id name profile',
+    select: '_id name image',
     match: {
       _id: { $ne: new mongoose.Types.ObjectId(user.id) },
     },
@@ -51,27 +61,50 @@ const getMessageFromDB = async (
 // update message
 const updateMessage = async (
   id: string,
+  user: JwtPayload,
   payload: Partial<IMessage>,
 ): Promise<IMessage | null> => {
-  checkMongooseIDValidation(id, 'Message')
-  console.log(payload)
-  const result = await Message.findByIdAndUpdate(id, payload, { new: true })
-  return result
-}
-
-// delete message
-const deleteMessage = async (id: string): Promise<IMessage | null> => {
   checkMongooseIDValidation(id, 'Message')
   const isExistMessage = await Message.findById(id)
   if (!isExistMessage) {
     throw new Error('Message not found')
   }
+  
+  if (isExistMessage.sender.toString() !== user.authId) {
+    throw new Error('You are not sender of this message')
+  }
+
+  const result = await Message.findByIdAndUpdate(id, payload, { new: true })
+  if (!result) {
+    throw new Error('Message not updated')
+  }
+
+ //@ts-ignore
+  const io = global.io
+  if (io && result.chatId) {
+    // send message to specific chatId Room
+    io.emit(`getMessage::${result?.chatId}`, result)
+  }
+
+  return result
+}
+
+// delete message
+const deleteMessage = async (id: string, user: JwtPayload): Promise<string | null> => {
+  checkMongooseIDValidation(id, 'Message')
+  const isExistMessage = await Message.findById(id)
+  if (!isExistMessage) {
+    throw new Error('Message not found')
+  }
+  if (isExistMessage.sender.toString() !== user.authId) {
+    throw new Error('You are not sender of this message')
+  }
   // unlink file if exist
   if (isExistMessage.image) {
     unlinkFile(isExistMessage.image)
   }
-  const result = await Message.findByIdAndDelete(id)
-  return result
+  await Message.findByIdAndDelete(id)
+  return "Message Delete Successfully"
 }
 
 export const MessageService = {

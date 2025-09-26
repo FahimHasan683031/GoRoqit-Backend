@@ -11,6 +11,7 @@ import { JwtPayload } from 'jsonwebtoken'
 
 // Update Profile
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
+  console.log("req.body",req.body)
   const result = await UserServices.updateProfile(req.user! as JwtPayload, req.body)
   sendResponse(res, {
     statusCode: StatusCodes.OK,

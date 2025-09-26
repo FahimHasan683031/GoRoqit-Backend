@@ -42,7 +42,7 @@ export type IApplicantProfile = {
   dateOfBirth?: Date;
   age?: number;
   previousEmployment?:"Yes"|"No";
-  compiteAddrase?: string;
+  streetAddress?: string;
   country?: string;
   city?: string;
   zipCode?: string;

@@ -12,7 +12,6 @@ import { AuthHelper } from '../auth/auth.helper'
 import { ApplicantProfile } from '../applicantProfile/applicantProfile.model'
 import { RecruiterProfile } from '../recruiterProfile/recruiterProfile.model'
 
-
 const createAdmin = async (): Promise<Partial<IUser> | null> => {
   const admin = {
     email: 'web.mohosin@gmail.com',
@@ -110,94 +109,76 @@ const deleteUser = async (id: string) => {
   return result
 }
 
-
-export const updateProfile = async (user:JwtPayload, payload: IUpdateProfilePayload) => {
- 
+export const updateProfile = async (
+  user: JwtPayload,
+  payload: IUpdateProfilePayload,
+) => {
   const isExistUser = await User.findById(user.authId)
 
   if (!isExistUser) {
-    throw new ApiError(StatusCodes.NOT_FOUND, "User not found or deleted.");
+    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found or deleted.')
   }
-  if (user.role !== isExistUser.role) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "you dont have permission to update profile.");
-  }
-  
+
   // 1. Update User basic fields (NO EMAIL update allowed)
   const updatedUser = await User.findOneAndUpdate(
     { _id: user.authId, status: { $ne: USER_STATUS.DELETED } },
     {
       ...(payload.name && { name: payload.name }),
+      ...(payload.firstName && { name: payload.firstName }),
+      ...(payload.firstName &&
+        payload.lastName && {
+          name: payload.firstName + ' ' + payload.lastName,
+        }),
+      ...(payload.firstName &&
+        payload.lastName &&
+        payload.middleName && {
+          name:
+            payload.firstName +
+            ' ' +
+            payload.middleName +
+            ' ' +
+            payload.lastName,
+        }),
       ...(payload.image && { image: payload.image }),
     },
-    { new: true }
-  );
+    { new: true },
+  )
 
-  
   // 2. Update role-based profile
   if (isExistUser.role === USER_ROLES.APPLICANT && isExistUser.profile) {
-    await ApplicantProfile.findByIdAndUpdate(
+    const res = await ApplicantProfile.findByIdAndUpdate(
       isExistUser.profile,
-      {
-        ...(payload.firstName && { firstName: payload.firstName }),
-        ...(payload.lastName && { lastName: payload.lastName }),
-        ...(payload.resume && { resume: payload.resume }),
-        ...(payload.skills && { skills: payload.skills }),
-        ...(payload.education && { education: payload.education }),
-        ...(payload.workExperience && { workExperience: payload.workExperience }),
-        ...(payload.preferredWorkType && { preferredWorkType: payload.preferredWorkType }),
-        ...(payload.languages && { languages: payload.languages }),  
-        ...(payload.salaryExpectation && { salaryExpectation: payload.salaryExpectation }),
-        ...(payload.openToWork !== undefined && { openToWork: payload.openToWork }),
-        ...(payload.bio && { bio: payload.bio }),
-        ...(payload.middleName && { middleName: payload.middleName }),
-        ...(payload.preferredName && { preferredName: payload.preferredName }),
-        ...(payload.gender && { gender: payload.gender }),
-        ...(payload.maritalStatus && { maritalStatus: payload.maritalStatus }),
-        ...(payload.citizenship && { citizenship: payload.citizenship }),
-        ...(payload.dateOfBirth && { dateOfBirth: payload.dateOfBirth }),
-        ...(payload.age && { age: payload.age }),
-        ...(payload.previousEmployment && { previousEmployment: payload.previousEmployment }),
-        ...(payload.compiteAddrase && { compiteAddrase: payload.compiteAddrase }),
-        ...(payload.country && { country: payload.country }),
-        ...(payload.city && { city: payload.city }),
-        ...(payload.zipCode && { zipCode: payload.zipCode }),
-
-      },
-      { new: true }
-    );
-    return "Profile updated successfully.";
+      payload,
+      { new: true },
+    )
+    // return "Profile updated successfully.";
+    return res
   } else if (isExistUser.role === USER_ROLES.RECRUITER && isExistUser.profile) {
-    await RecruiterProfile.findByIdAndUpdate(
+    const res = await RecruiterProfile.findByIdAndUpdate(
       isExistUser.profile,
-      {
-        ...(payload.companyName && { companyName: payload.companyName }),
-        ...(payload.companyWebsite && { companyWebsite: payload.companyWebsite }),
-        ...(payload.companyDescription && { companyDescription: payload.companyDescription }),
-        ...(payload.companyLogo && { companyLogo: payload.companyLogo }),
-        ...(payload.companyEmail && { companyEmail: payload.companyEmail }),
-        ...(payload.location && { location: payload.location }),
-        ...(payload.linkedinProfile && { linkedinProfile: payload.linkedinProfile }),
-        ...(payload.twitterProfile && { twitterProfile: payload.twitterProfile }),
-        ...(payload.facebookProfile && { facebookProfile: payload.facebookProfile }),
-        ...(payload.instagramProfile && { instagramProfile: payload.instagramProfile }),
-      },
-      { new: true }
-    );
-    return "Profile updated successfully.";
-  }else{
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Something went wrong.");
+      payload,
+      { new: true },
+    )
+    // return "Profile updated successfully.";
+    return res
+  } else {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong.')
   }
-};
+}
 
-const getProfile = async(user:JwtPayload) => {
+const getProfile = async (user: JwtPayload) => {
   console.log('getProfile user', user)
-  const isExistUser = await User.findById(user.authId).populate('profile').lean()
+  const isExistUser = await User.findById(user.authId)
+    .populate('profile')
+    .lean()
   if (!isExistUser) {
-    throw new ApiError(StatusCodes.NOT_FOUND, "The requested profile not found or deleted.");
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      'The requested profile not found or deleted.',
+    )
   }
   return isExistUser
 }
-
 
 export const UserServices = {
   updateProfile,

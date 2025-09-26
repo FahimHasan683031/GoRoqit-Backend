@@ -61,7 +61,7 @@ const ApplicantProfileSchema = new Schema<IApplicantProfile>(
     dateOfBirth: { type: Date, default: null },
     age: { type: Number, default: null },
     previousEmployment: { type: String, enum: ["Yes", "No"], default: null },
-    compiteAddrase: { type: String, default: null },
+    streetAddress: { type: String, default: null },
     country: { type: String, default: null },
     city: { type: String, default: null },
     zipCode: { type: String, default: null },

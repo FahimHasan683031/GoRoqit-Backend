@@ -7,8 +7,9 @@ import {
   fileAndBodyProcessorUsingDiskStorage,
 } from '../../middleware/processReqBody'
 import { UserValidations } from './user.validation'
-import fileUploadHandler from '../../middleware/fileUploadHandler'
-import { getSingleFilePath } from '../../../shared/getFilePath'
+import { validateProfileUpdate } from '../../middleware/profileValication'
+import { RecruiterProfileUpdateSchema } from '../recruiterProfile/recruiterProfile.validation'
+
 
 const router = express.Router()
 
@@ -21,7 +22,8 @@ router.patch(
     USER_ROLES.RECRUITER,
   ),
   fileAndBodyProcessorUsingDiskStorage(),
-  validateRequest(UserValidations.userUpdateSchema),
+  // validateProfileUpdate,
+  // validateRequest(RecruiterProfileUpdateSchema),
   UserController.updateProfile,
 )
 router.get('/me', auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER), UserController.getProfile)

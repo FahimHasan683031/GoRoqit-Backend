@@ -27,7 +27,7 @@ const getChatFromDB = async (user: JwtPayload, search: string): Promise<IChat[]>
     const chats = await Chat.find({ participants: { $in: [user.authId] } })
         .populate({
             path: 'participants',
-            select: '_id name profile',
+            select: '_id name image email',
             match: { _id: { $ne: user.authId } }
         })
         .select('participants status')
