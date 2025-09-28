@@ -42,12 +42,24 @@ const getAllJobs = async (query: Record<string, unknown>) => {
     .sort()
     .fields()
     .paginate()
-  
+    .populate([
+      {
+        path: 'user',
+        select: 'email name role image status verified profile roleProfile',
+        populate: {
+          path: 'profile',
+          model: 'RecruiterProfile',
+          select: 'companyName companyLogo',
+        },
+      },
+    ])
+
   const jobs = await jobQueryBuilder.modelQuery
   const paginationInfo = await jobQueryBuilder.getPaginationInfo()
+
   return {
     data: jobs,
-    meta: paginationInfo
+    meta: paginationInfo,
   }
 }
 
@@ -56,7 +68,16 @@ const getSingleJob = async (id: string): Promise<IJob> => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Job ID')
   }
 
-  const result = await Job.findById(id).populate('user')
+  const result = await Job.findById(id).populate([
+      {
+        path: 'user',
+        select: 'email name role image status verified profile roleProfile',
+        populate: {
+          path: 'profile',
+          model: 'RecruiterProfile'
+        },
+      },
+    ])
   if (!result) {
     throw new ApiError(
       StatusCodes.NOT_FOUND,

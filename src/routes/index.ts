@@ -11,6 +11,7 @@ import { ProfileRoutes } from '../app/modules/profile/profile.route'
 import { ChatRoutes } from '../app/modules/chat/chat.routes'
 import { MessageRoutes } from '../app/modules/message/message.routes'
 import { categoryRoutes } from '../app/modules/category/category.route'
+import { DashboardRoutes } from '../app/modules/dashboard/dashboard.rout'
 
 const router = express.Router()
 
@@ -27,6 +28,7 @@ const apiRoutes: { path: string; route: Router }[] = [
   { path: '/chat', route: ChatRoutes },
   { path: '/message', route: MessageRoutes },
   { path: '/category', route: categoryRoutes },
+  { path: '/dashboard', route: DashboardRoutes },
 ]
 
 apiRoutes.forEach(route => {

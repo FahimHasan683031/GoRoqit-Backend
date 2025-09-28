@@ -13,6 +13,7 @@ export const JobValidations = {
       description: z.string().max(500).optional(),
       responsibilities: z.string().max(500).optional(),
       jobLocation: z.string().min(3),
+      experianceLabel: z.enum(['Experienced', 'Beginner', 'Freshers']),
     }),
   }),
 
@@ -28,6 +29,7 @@ export const JobValidations = {
       description: z.string().max(500).optional(),
       responsibilities: z.string().max(500).optional(),
       jobLocation: z.string().min(3).optional(),
+      experianceLabel: z.enum(['Experienced', 'Beginner', 'Freshers']).optional(),
     }),
   }),
 }

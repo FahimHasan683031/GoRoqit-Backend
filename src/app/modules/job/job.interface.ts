@@ -12,5 +12,6 @@ export interface IJob {
   responsibilities?: string
   jobLocation: string
   user: Types.ObjectId
+  experianceLabel: 'Experienced' | 'Beginner' | 'Freshers'
   applicationsCount?: number
 }

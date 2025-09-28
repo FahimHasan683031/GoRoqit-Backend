@@ -15,7 +15,7 @@ const customLogin = catchAsync(async (req: Request, res: Response) => {
     statusCode: status,
     success: true,
     message: message,
-    data: { accessToken, refreshToken, role },
+    data: { accessToken, role },
   })
 })
 
@@ -75,7 +75,7 @@ const verifyAccount = catchAsync(async (req: Request, res: Response) => {
     statusCode: status,
     success: true,
     message: message,
-    data: { accessToken, refreshToken, role, token },
+    data: { accessToken, role },
   })
 })
 
@@ -145,7 +145,7 @@ const socialLogin = catchAsync(async (req: Request, res: Response) => {
     statusCode: status,
     success: true,
     message: message,
-    data: { accessToken, refreshToken, role },
+    data: { accessToken, role },
   })
 })
 export const CustomAuthController = {

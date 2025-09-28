@@ -26,8 +26,12 @@ router.patch(
   // validateRequest(RecruiterProfileUpdateSchema),
   UserController.updateProfile,
 )
-router.get('/me', auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER), UserController.getProfile)
+router.get('/me', auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER, USER_ROLES.ADMIN), UserController.getProfile)
 router.get('/',UserController.getAllUser),
+// get applicants
+router.get('/applicants',UserController.getApplicants)
+// get current user
+router.get('/current-user',auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER, USER_ROLES.ADMIN), UserController.getCurrentUser)
 // get single user
 router.get('/:id',UserController.getSingleUser)
 // update user role and create profile
@@ -40,5 +44,6 @@ router.patch(
 )
 // delete user
 router.delete('/:id',UserController.deleteUser)
+
 
 export const UserRoutes = router

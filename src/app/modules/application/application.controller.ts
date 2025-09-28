@@ -7,7 +7,6 @@ import { StatusCodes } from 'http-status-codes';
 
 const createApplication = catchAsync(async (req: Request, res: Response) => {
   const ApplicationData = req.body;
-
   const result = await ApplicationServices.createApplication(
     req.user!,
     ApplicationData

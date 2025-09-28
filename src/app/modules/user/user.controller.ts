@@ -6,6 +6,7 @@ import { UserServices } from './user.service'
 import { IUser } from './user.interface'
 import config from '../../../config'
 import { JwtPayload } from 'jsonwebtoken'
+import { IApplicantProfile } from '../applicantProfile/applicantProfile.interface'
 
 
 
@@ -22,12 +23,12 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserServices.getAllUser()
-  sendResponse<IUser[]>(res, {
+  const result = await UserServices.getAllUser(req.query)
+  sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: 'User fetched successfully',
-    data: result,
+    data: {...result},
   })
 })
 
@@ -85,6 +86,30 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+// get applicants
+const getApplicants = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserServices.getApplicants(req.query)
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Applicants fetched successfully',
+    data: result
+  })
+})
+
+// get current user
+const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserServices.getCurrentUser(req.user! as JwtPayload)
+  sendResponse<IUser>(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'User fetched successfully',
+    data: result,
+  })
+})
+
+
+
 
 
 export const UserController = {
@@ -94,4 +119,6 @@ export const UserController = {
   deleteUser,
   updateUserRoleAndCreateProfile,
   getProfile,
+  getApplicants,
+  getCurrentUser
 }

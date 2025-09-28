@@ -1,6 +1,6 @@
 import express from "express";
 import { PlanController } from "./plan.controller";
-import { createPlanZodValidationSchema } from "./plan.validation";
+import { createPlanZodValidationSchema, updatePlanZodValidationSchema } from "./plan.validation";
 import auth from "../../middleware/auth";
 import { USER_ROLES } from "../user/user.interface";
 import validateRequest from "../../middleware/validateRequest";
@@ -19,7 +19,11 @@ router.route("/")
 
 router
     .route("/:id")
-    .patch( auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER), PlanController.updatePlan)
+    .patch( 
+        auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER),
+        validateRequest(updatePlanZodValidationSchema),
+        PlanController.updatePlan
+    )
     .delete( auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER), PlanController.deletePlan)
 
 export const PlanRoutes = router;

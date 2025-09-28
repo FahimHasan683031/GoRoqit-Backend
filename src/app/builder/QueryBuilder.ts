@@ -1,4 +1,4 @@
-import { FilterQuery, Query } from 'mongoose'
+import { FilterQuery, Query, PopulateOptions } from 'mongoose'
 
 class QueryBuilder<T> {
   public modelQuery: Query<T[], T>
@@ -9,7 +9,7 @@ class QueryBuilder<T> {
     this.query = query
   }
 
-  //searching
+  // Searching
   search(searchableFields: string[]) {
     if (this?.query?.searchTerm) {
       this.modelQuery = this.modelQuery.find({
@@ -27,7 +27,7 @@ class QueryBuilder<T> {
     return this
   }
 
-  //filtering
+  // Filtering
   filter() {
     const queryObj = { ...this.query }
     const excludeFields = [
@@ -56,7 +56,6 @@ class QueryBuilder<T> {
         delete queryObj.maxSalary
       }
 
-      // Apply salary filter along with other filters
       this.modelQuery = this.modelQuery.find({
         ...cleanObject(queryObj),
         ...salaryFilter,
@@ -70,45 +69,46 @@ class QueryBuilder<T> {
     return this
   }
 
-  //sorting
+  // Sorting
   sort() {
     let sort = (this?.query?.sort as string) || '-createdAt'
     this.modelQuery = this.modelQuery.sort(sort)
-
     return this
   }
 
-  //pagination
+  // Pagination
   paginate() {
     let limit = Number(this?.query?.limit) || 10
     let page = Number(this?.query?.page) || 1
     let skip = (page - 1) * limit
 
     this.modelQuery = this.modelQuery.skip(skip).limit(limit)
-
     return this
   }
 
-  //fields filtering
+  // Fields filtering
   fields() {
     let fields = (this?.query?.fields as string)?.split(',').join(' ') || '-__v'
     this.modelQuery = this.modelQuery.select(fields)
-
     return this
   }
 
-  //populating
-  populate(populateFields: string[], selectFields: Record<string, unknown>) {
+  // Populating (flat + nested supported)
+  populate(
+    populateFields: (string | PopulateOptions)[],
+    selectFields: Record<string, unknown> = {},
+  ) {
     this.modelQuery = this.modelQuery.populate(
-      populateFields.map(field => ({
-        path: field,
-        select: selectFields[field],
-      })),
+      populateFields.map(field =>
+        typeof field === 'string'
+          ? { path: field, select: selectFields[field] }
+          : field,
+      ),
     )
     return this
   }
 
-  //pagination information
+  // Pagination info
   async getPaginationInfo() {
     const total = await this.modelQuery.model.countDocuments(
       this.modelQuery.getFilter(),
@@ -128,11 +128,8 @@ class QueryBuilder<T> {
 
 function cleanObject(obj: Record<string, any>) {
   const cleaned: Record<string, any> = {}
-
   for (const key in obj) {
     const value = obj[key]
-
-    // Skip null, undefined, empty string, empty array, or empty object
     if (
       value !== null &&
       value !== undefined &&
@@ -148,7 +145,6 @@ function cleanObject(obj: Record<string, any>) {
       cleaned[key] = value
     }
   }
-
   return cleaned
 }
 

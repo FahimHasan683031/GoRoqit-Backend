@@ -98,6 +98,16 @@ const getAllApplications = async (
     .sort()
     .paginate()
     .fields()
+    .populate([
+      {
+        path: 'job',
+        select: 'title location',
+      },
+      {
+        path: 'author',
+        select: 'companyName',
+      }
+    ])
   const applications = await applicationQuery.modelQuery
   const paginationInfo = await applicationQuery.getPaginationInfo()
   return {
@@ -111,7 +121,7 @@ const getSingleApplication = async (id: string): Promise<IApplication> => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Application ID')
   }
 
-  const result = await Application.findById(id).populate(['job', 'applicant'])
+  const result = await Application.findById(id).populate(['job', 'applicant', 'author'])
   if (!result) {
     throw new ApiError(
       StatusCodes.NOT_FOUND,

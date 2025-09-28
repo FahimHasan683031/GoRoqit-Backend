@@ -44,7 +44,7 @@ const googleAuthCallback = catchAsync(async (req: Request, res: Response) => {
     statusCode: status,
     success: true,
     message: message,
-    data: { accessToken, refreshToken, role },
+    data: { accessToken, role },
   })
 })
 

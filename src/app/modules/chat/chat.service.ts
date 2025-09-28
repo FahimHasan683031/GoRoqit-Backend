@@ -40,8 +40,11 @@ const getChatFromDB = async (user: JwtPayload, search: string): Promise<IChat[]>
     const chatIds = filteredChats.map(chat => chat._id);
     const lastMessages = await Message.find({ chatId: { $in: chatIds } })
         .sort({ createdAt: -1 })
-        .select('text offer createdAt sender chatId')
+        .select('text image createdAt sender chatId')
+        .limit(1)
         .lean();
+
+        console.log(lastMessages)
 
     // Map last messages to their respective chats
     const lastMessageMap = new Map(lastMessages.map(msg => [msg.chatId.toString(), msg]));

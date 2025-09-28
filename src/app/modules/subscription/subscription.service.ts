@@ -37,7 +37,7 @@ const subscriptionsFromDB = async (query: Record<string, unknown>) => {
                 select: "title price duration"
             },
             {
-                path: "vendor",
+                path: "customerId",
                 select: "name email profile"
             }
         ])

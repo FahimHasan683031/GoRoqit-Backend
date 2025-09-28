@@ -10,7 +10,7 @@ export const ApplicationValidations = {
       email: z.string(),
       phone: z.string(),
       resume: z.string(),
-      experience: z.number()
+      experience: z.string()
     }),
   }),
 
@@ -23,7 +23,7 @@ export const ApplicationValidations = {
       email: z.string().optional(),
       phone: z.string().optional(),
       resume: z.string().optional(),
-      experience: z.number().optional()
+      experience: z.string().optional()
     }),
   }),
 }

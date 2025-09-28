@@ -41,6 +41,10 @@ const planSchema = new Schema<IPlan, PlanModel>(
             type: String,
             enum: ['Active', 'Delete'],
             default: "Active"
+        },
+        features: {
+            type: [String],
+            required: true
         }
     },
     {

@@ -10,6 +10,7 @@ export type IPlan = {
     paymentLink?: string;
     status: 'Active' | 'Delete';
     priceId?: string;
+    features: string[];
 }
 
 export type PlanModel = Model<IPlan, Record<string, unknown>>;

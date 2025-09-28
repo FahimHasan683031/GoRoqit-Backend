@@ -11,6 +11,7 @@ import { authResponse } from '../auth/common'
 import { AuthHelper } from '../auth/auth.helper'
 import { ApplicantProfile } from '../applicantProfile/applicantProfile.model'
 import { RecruiterProfile } from '../recruiterProfile/recruiterProfile.model'
+import QueryBuilder from '../../builder/QueryBuilder'
 
 const createAdmin = async (): Promise<Partial<IUser> | null> => {
   const admin = {
@@ -45,9 +46,40 @@ const createAdmin = async (): Promise<Partial<IUser> | null> => {
   return result[0]
 }
 
-const getAllUser = async () => {
-  const result = await User.find()
-  return result
+const getAllUser = async (query: Record<string, unknown>) => {
+  const userQueryBuilder = new QueryBuilder(
+    User.find(),
+    query
+  )
+    .filter()
+    .sort()
+    .fields()
+    .paginate()
+
+  const users = await userQueryBuilder.modelQuery.lean();
+  const paginationInfo = await userQueryBuilder.getPaginationInfo();
+
+
+    const totalUsers = await User.countDocuments();
+
+    const totalRecruiters = await User.countDocuments({
+    role: USER_ROLES.RECRUITER,
+  });
+
+  const totalApplicants = await User.countDocuments({
+    role: USER_ROLES.APPLICANT,
+  });
+
+  const staticData = {totalUsers,
+    totalRecruiters,
+    totalApplicants,
+  }
+
+  return {
+     users,staticData,
+    meta: paginationInfo,
+  };
+
 }
 
 const getSingleUser = async (id: string) => {
@@ -167,7 +199,6 @@ export const updateProfile = async (
 }
 
 const getProfile = async (user: JwtPayload) => {
-  console.log('getProfile user', user)
   const isExistUser = await User.findById(user.authId)
     .populate('profile')
     .lean()
@@ -180,6 +211,42 @@ const getProfile = async (user: JwtPayload) => {
   return isExistUser
 }
 
+const getCurrentUser = async (user: JwtPayload) => {
+  const isExistUser = await User.findById(user.authId)
+  if (!isExistUser) {
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      'The requested profile not found or deleted.',
+    )
+  }
+  return isExistUser
+}
+
+const getApplicants = async (query: Record<string, unknown>) => {
+  const applicantQueryBuilder = new QueryBuilder(
+    ApplicantProfile.find({ openToWork: true }),
+    query
+  )
+    .search(["firstName", "lastName", "preferredName", "skills", "city", "country"]) 
+    .filter()
+    .sort()
+    .fields()
+    .paginate()
+    .populate(["userId"], {
+      userId: "email name role image status verified", 
+    });
+
+  const applicants = await applicantQueryBuilder.modelQuery.lean();
+  const paginationInfo = await applicantQueryBuilder.getPaginationInfo();
+
+  return {
+    data: applicants,
+    meta: paginationInfo,
+  };
+}
+
+
+
 export const UserServices = {
   updateProfile,
   updateUserRoleAndCreateProfile,
@@ -188,4 +255,6 @@ export const UserServices = {
   getSingleUser,
   deleteUser,
   getProfile,
+  getApplicants,
+  getCurrentUser
 }
