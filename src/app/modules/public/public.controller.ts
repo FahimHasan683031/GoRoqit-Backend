@@ -52,6 +52,19 @@ const createContact = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const getAllContacts = catchAsync(async (req: Request, res: Response) => {
+  const result = await PublicServices.getAllContacts(req.query)
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Contacts retrieved successfully',
+    data: result,
+  })
+})
+
+
+
 const createFaq = catchAsync(async (req: Request, res: Response) => {
   const faqData = req.body
   const result = await PublicServices.createFaq(faqData)
@@ -122,4 +135,5 @@ export const PublicController = {
   getSingleFaq,
   getAllFaqs,
   deleteFaq,
+  getAllContacts,
 }

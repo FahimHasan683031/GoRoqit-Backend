@@ -1,3 +1,4 @@
+import QueryBuilder from "../../builder/QueryBuilder";
 import { Category } from "./category.model";
 
 
@@ -9,9 +10,18 @@ export const createCategory = async (payload: { name: string }) => {
 
 
 // get categories
-export const getCategories = async () => {
-  const categories = await Category.find();
-  return categories;
+export const getCategories = async (query: Record<string, unknown>) => {
+ const categoryQueryBuilder = new QueryBuilder(Category.find(), query)
+    .filter()
+    .sort()
+    .paginate()
+   const categories = await categoryQueryBuilder.modelQuery
+  const paginationInfo = await categoryQueryBuilder.getPaginationInfo()
+
+  return {
+    data: categories,
+    meta: paginationInfo,
+  }
 };
 
 // Delete category

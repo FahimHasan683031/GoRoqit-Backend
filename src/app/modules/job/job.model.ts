@@ -5,7 +5,7 @@ const jobSchema = new Schema<IJob>(
   {
     title: { type: String, required: true },
     category: { type: String },
-    type: { type: String, enum: ['Full-time', 'Remote', 'Freelance'], required: true },
+    type: { type: String, enum: ['Full-time', 'Remote', 'Freelance', 'Part-time', 'Contract'], required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date },
     minSalary: { type: Number, required: true },

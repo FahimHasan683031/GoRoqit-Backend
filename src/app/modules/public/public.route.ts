@@ -20,6 +20,9 @@ router.post(
   validateRequest(PublicValidation.contactZodSchema),
   PublicController.createContact,
 )
+router.get('/contact/all', PublicController.getAllContacts)
+
+
 
 router.post(
   '/faq',

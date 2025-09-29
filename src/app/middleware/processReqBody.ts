@@ -149,10 +149,10 @@ export const fileAndBodyProcessorUsingDiskStorage = () => {
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true })
   }
-
   // Configure storage
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
+      console.log(file)
       const folderPath = path.join(uploadsDir, file.fieldname)
       if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath, { recursive: true })

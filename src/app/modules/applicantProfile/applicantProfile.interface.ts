@@ -24,6 +24,7 @@ export type IWorkExperience = {
 export type IApplicantProfile = {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
+  expartes?: string[];
   resume?: string;
   skills?: string[];
   education?: IEducation[];

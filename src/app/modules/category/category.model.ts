@@ -9,6 +9,16 @@ const CategorySchema = new Schema<ICategory>(
       trim: true,
       maxlength: 50,
     },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 200,
+      default: '',
+    },
+    status: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

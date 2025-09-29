@@ -33,6 +33,7 @@ export const WorkExperienceUpdateSchema = z.object({
 export const ApplicantProfileUpdateSchema = z.object({
   resume: z.string().optional(),
   skills: z.array(z.string()).optional(),
+  expartes: z.array(z.string()).optional(),
   education: z.array(EducationUpdateSchema).optional(),
   workExperience: z.array(WorkExperienceUpdateSchema).optional(),
   preferredWorkType: z

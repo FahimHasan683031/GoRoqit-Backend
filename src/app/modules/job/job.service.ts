@@ -7,6 +7,8 @@ import { jobSearchableFields } from './job.constants'
 import { Types } from 'mongoose'
 import QueryBuilder from '../../builder/QueryBuilder'
 import { Category } from '../category/category.model'
+import { USER_ROLES } from '../user/user.interface'
+import { Application } from '../application/application.model'
 
 const createJob = async (user: JwtPayload, payload: IJob): Promise<IJob> => {
   try {
@@ -35,7 +37,8 @@ const createJob = async (user: JwtPayload, payload: IJob): Promise<IJob> => {
   }
 }
 
-const getAllJobs = async (query: Record<string, unknown>) => {
+const getAllJobs = async ( query: Record<string, unknown>) => {
+
   const jobQueryBuilder = new QueryBuilder(Job.find(), query)
     .filter()
     .search(jobSearchableFields)
@@ -54,12 +57,14 @@ const getAllJobs = async (query: Record<string, unknown>) => {
       },
     ])
 
+    const totalApplications = await Application.countDocuments()
+
   const jobs = await jobQueryBuilder.modelQuery
   const paginationInfo = await jobQueryBuilder.getPaginationInfo()
 
   return {
     data: jobs,
-    meta: paginationInfo,
+    meta: {...paginationInfo,totalApplications},
   }
 }
 

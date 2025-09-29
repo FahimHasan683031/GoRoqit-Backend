@@ -8,12 +8,14 @@ export type IPublic = {
 export interface IContact {
   name: string
   email: string
-  phone: string
-  country: string
+  phone?: string
   message: string
   createdAt?: Date
   updatedAt?: Date
 }
+
+export type ContactModel = Model<IContact>
+
 export type PublicModel = Model<IPublic>
 
 export type IFaq = {

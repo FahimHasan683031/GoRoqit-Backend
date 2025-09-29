@@ -50,6 +50,7 @@ const ApplicantProfileSchema = new Schema<IApplicantProfile>(
     },
     languages: { type: [String], default: [] },
     salaryExpectation: { type: String, default: null },
+    expartes: { type: [String], default: [] },
     openToWork: { type: Boolean, default: false },
     firstName: { type: String, required: true, trim: true, maxlength: 50 },
     lastName: { type: String, trim: true, maxlength: 50 },

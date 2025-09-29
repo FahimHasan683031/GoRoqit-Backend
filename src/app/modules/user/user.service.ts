@@ -145,6 +145,7 @@ export const updateProfile = async (
   user: JwtPayload,
   payload: IUpdateProfilePayload,
 ) => {
+  
   const isExistUser = await User.findById(user.authId)
 
   if (!isExistUser) {

@@ -1,13 +1,12 @@
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../../errors/ApiError'
 import { IContact, IFaq, IPublic } from './public.interface'
-import { Faq, Public } from './public.model'
+import { Contact, Faq, Public } from './public.model'
 
 import { User } from '../user/user.model'
 import { emailHelper } from '../../../helpers/emailHelper'
-// import { redisClient } from '../../../helpers/redis'
-// import { RedisKeys } from '../../../enum/redis.keys'
-// import { emailQueue } from '../../../helpers/bull-mq-producer'
+import QueryBuilder from '../../builder/QueryBuilder'
+
 
 
 const createPublic = async (payload: IPublic) => {
@@ -83,7 +82,6 @@ const createContact = async (payload: IContact) => {
           <li><strong>Name:</strong> ${payload.name}</li>
           <li><strong>Email:</strong> ${payload.email}</li>
           <li><strong>Phone:</strong> ${payload.phone}</li>
-          <li><strong>Country:</strong> ${payload.country}</li>
         </ul>
         <h2>Message:</h2>
         <p>${payload.message}</p>
@@ -91,7 +89,7 @@ const createContact = async (payload: IContact) => {
       `,
     }
 
-    // emailQueue.add('emails', emailData)
+    await emailHelper.sendEmail(emailData);
 
     // Send confirmation email to the user
     const userEmailData = {
@@ -107,7 +105,10 @@ const createContact = async (payload: IContact) => {
       `,
     }
 
-    // emailQueue.add('emails', userEmailData)
+    await emailHelper.sendEmail(userEmailData);
+    const result = await Contact.create(payload)
+    if (!result)
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create Contact')
 
     return {
       message: 'Contact form submitted successfully',
@@ -117,6 +118,17 @@ const createContact = async (payload: IContact) => {
       StatusCodes.INTERNAL_SERVER_ERROR,
       'Failed to submit contact form',
     )
+  }
+}
+
+const getAllContacts = async (query: Record<string, unknown>) => {
+  const contactQueryBuilder =new QueryBuilder(Contact.find(), query)
+  const result = await contactQueryBuilder.modelQuery
+
+  const paginationResult = await contactQueryBuilder.paginate()
+  return {
+    meta: paginationResult,
+    data: result,
   }
 }
 
@@ -171,4 +183,5 @@ export const PublicServices = {
   getSingleFaq,
   updateFaq,
   deleteFaq,
+  getAllContacts,
 }

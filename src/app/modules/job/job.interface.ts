@@ -3,7 +3,7 @@ import { Types } from 'mongoose'
 export interface IJob {
   title: string
   category?: string
-  type: 'Full-time' | 'Remote' | 'Freelance'
+  type: 'Full-time' | 'Remote' | 'Freelance' | 'Part-time' | 'Contract'
   startDate: Date
   endDate?: Date
   minSalary: number
