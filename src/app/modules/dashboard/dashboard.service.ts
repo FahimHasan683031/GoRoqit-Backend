@@ -4,7 +4,8 @@ import { Subscription } from '../subscription/subscription.model'
 import { Application } from '../application/application.model'
 import { USER_ROLES } from '../user/user.interface'
 import { calculateMonthlyRevenue } from './revenue.utils'
-
+import { JwtPayload } from 'jsonwebtoken'
+import { Message } from '../message/message.model'
 
 export const getDashboardStatistics = async (year?: string) => {
   // Default to current year if not provided
@@ -50,7 +51,6 @@ export const getDashboardStatistics = async (year?: string) => {
 
   const monthlyRevenue = await calculateMonthlyRevenue(targetYear)
 
-
   return {
     users: {
       totalUsers,
@@ -73,6 +73,22 @@ export const getDashboardStatistics = async (year?: string) => {
     monthlyRevenue,
   }
 }
+
+const rectuterStatistics = async (user: JwtPayload, year?: string) => {
+  const totalJobs = await Job.countDocuments({ user: user.authId })
+  const totalApplications = await Application.countDocuments({
+    author: user.authId,
+  })
+  const totalChats = await Message.countDocuments({
+    participants: { $in: [user.authId] },
+  })
+  return {
+    totalJobs,
+    totalApplications,
+    totalChats,
+  }
+}
 export const DashboardServices = {
   getDashboardStatistics,
+  rectuterStatistics
 }

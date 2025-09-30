@@ -35,7 +35,7 @@ export const createStripeProductCatalog = async ( payload: Partial<IPlan>): Prom
             break;
         default:
             interval = 'month';
-            intervalCount = 1; // Defaults to 1 month if duration is not specified
+            intervalCount = 1; 
     }
 
 
@@ -62,7 +62,7 @@ export const createStripeProductCatalog = async ( payload: Partial<IPlan>): Prom
         after_completion: {
             type: 'redirect',
             redirect: {
-                url: `${config.stripe.paymentSuccess}`, // Redirect URL on successful payment
+                url: `${config.stripe.paymentSuccess}/payments/success`, // Redirect URL on successful payment
             },
         },
         metadata: {

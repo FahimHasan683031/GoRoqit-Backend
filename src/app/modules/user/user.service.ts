@@ -12,12 +12,14 @@ import { AuthHelper } from '../auth/auth.helper'
 import { ApplicantProfile } from '../applicantProfile/applicantProfile.model'
 import { RecruiterProfile } from '../recruiterProfile/recruiterProfile.model'
 import QueryBuilder from '../../builder/QueryBuilder'
+import config from '../../../config'
+
 
 const createAdmin = async (): Promise<Partial<IUser> | null> => {
   const admin = {
-    email: 'web.mohosin@gmail.com',
-    name: 'Md Mohosin',
-    password: '12345678',
+    email: config.super_admin.email,
+    name: config.super_admin.name,
+    password: config.super_admin.password,
     role: USER_ROLES.ADMIN,
     status: USER_STATUS.ACTIVE,
     verified: true,
