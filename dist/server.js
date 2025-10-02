@@ -27,12 +27,13 @@ async function main() {
         mongoose_1.default.connect(config_1.default.database_url);
         logger_1.logger.info(colors_1.default.green('🚀 Database connected successfully'));
         const port = typeof config_1.default.port === 'number' ? config_1.default.port : Number(config_1.default.port);
-        server = app_1.default.listen(port, config_1.default.ip_address, () => {
+        // server = app.listen(port, config.ip_address as string, () => {
+        //   logger.info(
+        //     colors.yellow(`♻️  Application listening on port:${config.port}`),
+        //   )
+        // })
+        server = app_1.default.listen(port, () => {
             logger_1.logger.info(colors_1.default.yellow(`♻️  Application listening on port:${config_1.default.port}`));
-            //  server = app.listen(port,() => {
-            // logger.info(
-            //   colors.yellow(`♻️  Application listening on port:${config.port}`),
-            // )
         });
         //socket
         const io = new socket_io_1.Server(server, {
@@ -48,7 +49,7 @@ async function main() {
         // emailWorker
         // const pubClient = redisClient
         // const subClient = pubClient.duplicate()
-        logger_1.logger.info(colors_1.default.green('🍁 Redis connected successfully'));
+        logger_1.logger.info(colors_1.default.green('🍁 Server connected successfully'));
         // io.adapter(createAdapter(pubClient, subClient))
         socketHelper_1.socketHelper.socket(io);
         //@ts-ignore

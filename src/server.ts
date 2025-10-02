@@ -37,7 +37,6 @@ async function main() {
       logger.info(
         colors.yellow(`♻️  Application listening on port:${config.port}`),
       )
-
     })
 
     //socket
