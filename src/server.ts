@@ -26,15 +26,18 @@ async function main() {
     const port =
       typeof config.port === 'number' ? config.port : Number(config.port)
 
-    server = app.listen(port, config.ip_address as string, () => {
+    // server = app.listen(port, config.ip_address as string, () => {
+    //   logger.info(
+    //     colors.yellow(`♻️  Application listening on port:${config.port}`),
+    //   )
+
+    // })
+       
+      server = app.listen(port, () => {
       logger.info(
         colors.yellow(`♻️  Application listening on port:${config.port}`),
       )
 
-      //  server = app.listen(port,() => {
-      // logger.info(
-      //   colors.yellow(`♻️  Application listening on port:${config.port}`),
-      // )
     })
 
     //socket
@@ -55,7 +58,7 @@ async function main() {
     // const pubClient = redisClient
     // const subClient = pubClient.duplicate()
 
-    logger.info(colors.green('🍁 Redis connected successfully'))
+    logger.info(colors.green('🍁 Server connected successfully'))
 
     // io.adapter(createAdapter(pubClient, subClient))
     socketHelper.socket(io)
