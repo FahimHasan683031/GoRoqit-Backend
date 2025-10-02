@@ -1,0 +1,40 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.JobRoutes = void 0;
+const express_1 = __importDefault(require("express"));
+const job_controller_1 = require("./job.controller");
+const job_validation_1 = require("./job.validation");
+const validateRequest_1 = __importDefault(require("../../middleware/validateRequest"));
+const auth_1 = __importDefault(require("../../middleware/auth"));
+const user_1 = require("../../../enum/user");
+const validateJobCreation_1 = require("../../middleware/validateJobCreation");
+const router = express_1.default.Router();
+router.get('/', 
+// auth(
+//   USER_ROLES.ADMIN,
+//   USER_ROLES.RECRUITER
+// ),
+job_controller_1.JobController.getAllJobs);
+router.get('/:id', 
+// auth(
+//    USER_ROLES.ADMIN,
+//   USER_ROLES.RECRUITER
+// ),
+job_controller_1.JobController.getSingleJob);
+router.post('/', (0, auth_1.default)(user_1.USER_ROLES.ADMIN, user_1.USER_ROLES.RECRUITER, user_1.USER_ROLES.APPLICANT, user_1.USER_ROLES.GUEST), validateJobCreation_1.validateJobCreation, (0, validateRequest_1.default)(job_validation_1.JobValidations.createJobZodSchema), job_controller_1.JobController.createJob);
+router.patch('/:id', 
+// auth(
+//   USER_ROLES.ADMIN,
+//   USER_ROLES.RECRUITER
+// ),
+(0, validateRequest_1.default)(job_validation_1.JobValidations.updateJobZodSchema), job_controller_1.JobController.updateJob);
+router.delete('/:id', 
+// auth(
+//    USER_ROLES.ADMIN,
+//   USER_ROLES.RECRUITER
+// ),
+job_controller_1.JobController.deleteJob);
+exports.JobRoutes = router;

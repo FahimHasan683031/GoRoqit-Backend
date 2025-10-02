@@ -2,8 +2,6 @@ import passport from 'passport'
 import { User } from '../../../user/user.model'
 import { Strategy as LocalStrategy } from 'passport-local'
 import { USER_ROLES, USER_STATUS } from '../../../../../enum/user'
-
-
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import config from '../../../../../config'
 import ApiError from '../../../../../errors/ApiError'
@@ -52,7 +50,7 @@ passport.use(
     },
     async (req, accessToken, refreshToken, profile, done) => {
       req.body.profile = profile
-      req.body.role = USER_ROLES.CUSTOMER
+      req.body.role = USER_ROLES.APPLICANT
 
       try {
         return done(null, req.body)
