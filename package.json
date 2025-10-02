@@ -18,7 +18,9 @@
     "prettier:fix": "prettier --write .",
     "lint-prettier": "yarn lint:check && yarn prettier:check",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky"
+    "prepare": "husky",
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.782.0",
