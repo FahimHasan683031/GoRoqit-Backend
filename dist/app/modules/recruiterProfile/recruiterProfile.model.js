@@ -55,6 +55,5 @@ const RecruiterProfileSchema = new mongoose_1.Schema({
     instagramProfile: { type: String, default: null },
     bio: { type: String, maxlength: 500 },
 }, { timestamps: true });
-RecruiterProfileSchema.index({ userId: 1 });
 RecruiterProfileSchema.index({ companyName: 1 });
 exports.RecruiterProfile = mongoose_1.default.model("RecruiterProfile", RecruiterProfileSchema);

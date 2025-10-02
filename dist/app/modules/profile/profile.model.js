@@ -114,7 +114,6 @@ const ProfileSchema = new mongoose_1.Schema({
     recruiterData: { type: RecruiterDataSchema },
     adminData: { type: AdminDataSchema },
 }, { timestamps: true });
-ProfileSchema.index({ userId: 1 });
 ProfileSchema.index({ role: 1 });
 ProfileSchema.index({ "applicantData.skills": 1 });
 ProfileSchema.index({ "applicantData.openToWork": 1 });

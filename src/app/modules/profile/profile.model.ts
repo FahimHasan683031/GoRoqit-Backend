@@ -106,7 +106,6 @@ const ProfileSchema = new Schema<IProfile>(
   { timestamps: true }
 );
 
-ProfileSchema.index({ userId: 1 });
 ProfileSchema.index({ role: 1 });
 ProfileSchema.index({ "applicantData.skills": 1 });
 ProfileSchema.index({ "applicantData.openToWork": 1 });

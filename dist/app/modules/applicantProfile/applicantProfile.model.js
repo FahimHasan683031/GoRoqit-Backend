@@ -96,7 +96,6 @@ const ApplicantProfileSchema = new mongoose_1.Schema({
     landLine: { type: String, default: null },
     bio: { type: String, maxlength: 500, default: null },
 }, { timestamps: true });
-ApplicantProfileSchema.index({ userId: 1 });
 ApplicantProfileSchema.index({ skills: 1 });
 ApplicantProfileSchema.index({ openToWork: 1 });
 exports.ApplicantProfile = mongoose_1.default.model("ApplicantProfile", ApplicantProfileSchema);

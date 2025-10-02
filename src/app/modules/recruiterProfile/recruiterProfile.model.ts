@@ -26,7 +26,6 @@ const RecruiterProfileSchema = new Schema<IRecruiterProfile>(
   { timestamps: true }
 );
 
-RecruiterProfileSchema.index({ userId: 1 });
 RecruiterProfileSchema.index({ companyName: 1 });
 
 export const RecruiterProfile = mongoose.model<IRecruiterProfile>(

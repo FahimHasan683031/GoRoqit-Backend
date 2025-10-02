@@ -74,7 +74,6 @@ const ApplicantProfileSchema = new Schema<IApplicantProfile>(
   { timestamps: true }
 );
 
-ApplicantProfileSchema.index({ userId: 1 });
 ApplicantProfileSchema.index({ skills: 1 });
 ApplicantProfileSchema.index({ openToWork: 1 });
 
