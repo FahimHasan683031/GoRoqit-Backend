@@ -42,6 +42,7 @@ export type IUser = {
   createdAt: Date;
   updatedAt: Date;
   subscribe?: boolean;
+  profileCompletion?: number;
 };
 
 

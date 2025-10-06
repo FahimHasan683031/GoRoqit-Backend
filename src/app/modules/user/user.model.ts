@@ -58,6 +58,7 @@ const UserSchema = new Schema<IUser, UserModel>(
       type: String,
       required: false,
     },
+    profileCompletion: { type: Number, default: 0 },
     authentication: {
       _id: false,
       select: false,

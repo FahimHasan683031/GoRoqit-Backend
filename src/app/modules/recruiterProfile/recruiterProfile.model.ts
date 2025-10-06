@@ -1,5 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { IRecruiterProfile } from "./recruiterProfile.interface";
+import { calculateCompletion } from "../../../helpers/calculateProfileCompleation";
+import { User } from "../user/user.model";
 
 
 const RecruiterProfileSchema = new Schema<IRecruiterProfile>(
@@ -25,6 +27,33 @@ const RecruiterProfileSchema = new Schema<IRecruiterProfile>(
   },
   { timestamps: true }
 );
+
+RecruiterProfileSchema.pre("save", async function (next) {
+  const fields = [
+    "companyName", "companyWebsite", "companyDescription", "companyLogo",
+    "phone", "companyEmail", "location", "linkedinProfile", "twitterProfile",
+    "facebookProfile", "instagramProfile", "bio"
+  ];
+
+  const docObject = this.toObject ? this.toObject() : this;
+  (this as any)._completion = calculateCompletion(docObject, fields);
+  next();
+});
+
+RecruiterProfileSchema.post('findOneAndUpdate', async function (doc) {
+  if (!doc) return;
+  
+  const fields = [
+    "companyName", "companyWebsite", "companyDescription", "companyLogo",
+    "phone", "companyEmail", "location", "linkedinProfile", "twitterProfile",
+    "facebookProfile", "instagramProfile", "bio"
+  ];
+
+  const docObject = doc.toObject ? doc.toObject() : doc;
+  const percentage = calculateCompletion(docObject, fields);
+  
+  await User.findByIdAndUpdate(doc.userId, { profileCompletion: percentage });
+});
 
 RecruiterProfileSchema.index({ companyName: 1 });
 

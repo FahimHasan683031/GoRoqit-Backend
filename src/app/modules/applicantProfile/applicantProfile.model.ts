@@ -1,5 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { IApplicantProfile, IEducation, IWorkExperience } from "./applicantProfile.interface";
+import { User } from "../user/user.model";
+import { calculateCompletion } from "../../../helpers/calculateProfileCompleation";
 
 const EducationSchema = new Schema<IEducation>(
   {
@@ -73,6 +75,40 @@ const ApplicantProfileSchema = new Schema<IApplicantProfile>(
   },
   { timestamps: true }
 );
+
+
+
+ApplicantProfileSchema.pre("save", async function (next) {
+  const fields = [
+    "resume", "skills", "education", "workExperience", "preferredWorkType",
+    "languages", "salaryExpectation", "expartes", "openToWork", "firstName",
+    "lastName", "preferredName", "gender", "maritalStatus", "citizenship",
+    "dateOfBirth", "streetAddress", "country", "city", "zipCode", "mobile", "bio"
+  ];
+
+  const docObject = this.toObject ? this.toObject() : this;
+  (this as any)._completion = calculateCompletion(docObject, fields);
+  next();
+});
+
+// Add this after your existing post-save hook
+ApplicantProfileSchema.post('findOneAndUpdate', async function (doc) {
+  if (!doc) return;
+  
+  const fields = [
+    "resume", "skills", "education", "workExperience", "preferredWorkType",
+    "languages", "salaryExpectation", "expartes", "openToWork", "firstName",
+    "lastName", "preferredName", "gender", "maritalStatus", "citizenship",
+    "dateOfBirth", "streetAddress", "country", "city", "zipCode", "mobile", "bio"
+  ];
+
+  const docObject = doc.toObject ? doc.toObject() : doc;
+  const percentage = calculateCompletion(docObject, fields);
+  
+  await User.findByIdAndUpdate(doc.userId, { profileCompletion: percentage });
+});
+
+
 
 ApplicantProfileSchema.index({ skills: 1 });
 ApplicantProfileSchema.index({ openToWork: 1 });

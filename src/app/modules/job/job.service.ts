@@ -9,9 +9,24 @@ import QueryBuilder from '../../builder/QueryBuilder'
 import { Category } from '../category/category.model'
 import { USER_ROLES } from '../user/user.interface'
 import { Application } from '../application/application.model'
+import { User } from '../user/user.model'
 
 const createJob = async (user: JwtPayload, payload: IJob): Promise<IJob> => {
   try {
+    const isExistUser = await User.findById(user.authId)
+    if (!isExistUser) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found!')
+    }
+    if (!isExistUser.profileCompletion || isExistUser.profileCompletion < 70) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Please complete your profile first!')
+    }
+    if (user.role !== USER_ROLES.RECRUITER) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Only Recruiters can create jobs',
+      )
+    }
+
     const checkCategory = await Category.findOne({ name: payload.category })
     if (!checkCategory) {
       throw new ApiError(

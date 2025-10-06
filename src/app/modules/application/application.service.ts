@@ -7,6 +7,7 @@ import mongoose, { Types } from 'mongoose'
 import QueryBuilder from '../../builder/QueryBuilder'
 import { Job } from '../job/job.model'
 import { USER_ROLES } from '../user/user.interface'
+import { User } from '../user/user.model'
 
 export const createApplication = async (
   user: JwtPayload,
@@ -16,6 +17,13 @@ export const createApplication = async (
 
   try {
     session.startTransaction()
+    const isExistUser = await User.findById(user.authId)
+    if (!isExistUser) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found!')
+    }
+    if (!isExistUser.profileCompletion || isExistUser.profileCompletion < 70) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Please complete your profile first!')
+    }
 
     const job = await Job.findById(payload.job)
     if (!job) {
@@ -27,6 +35,7 @@ export const createApplication = async (
         'Only Applicants can apply for jobs',
       )
     }
+
     const alreadyApplied = await Application.findOne({
       job: job._id,
       applicant: user.authId,
@@ -106,13 +115,13 @@ const getAllApplications = async (
       {
         path: 'author',
         select: 'companyName',
-      }
+      },
     ])
   const applications = await applicationQuery.modelQuery
   const paginationInfo = await applicationQuery.getPaginationInfo()
   return {
     data: applications,
-    meta:paginationInfo,
+    meta: paginationInfo,
   }
 }
 
@@ -121,7 +130,11 @@ const getSingleApplication = async (id: string): Promise<IApplication> => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Application ID')
   }
 
-  const result = await Application.findById(id).populate(['job', 'applicant', 'author'])
+  const result = await Application.findById(id).populate([
+    'job',
+    'applicant',
+    'author',
+  ])
   if (!result) {
     throw new ApiError(
       StatusCodes.NOT_FOUND,
