@@ -49,7 +49,7 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
 
     const amountPaid = (invoice?.total || 0) / 100
 
-    console.log("subscription:", subscription)
+   
 
     // Find user and pricing plan
     const user = (await User.findOne({ email: customer.email })) as any
@@ -91,7 +91,6 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       trxId,
       subscriptionId: subscription.id,
       status: 'active',
-      invoice,
       currentPeriodStart,
       currentPeriodEnd,
     }
