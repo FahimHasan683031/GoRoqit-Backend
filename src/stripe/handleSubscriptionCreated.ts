@@ -26,6 +26,8 @@ const createNewSubscription = async (payload: any) => {
 
 export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
   try {
+    console.log("Hit Hit")
+    console.log("Subscription created event:", data)
     // Retrieve subscription details from Stripe
     const subscription = await stripe.subscriptions.retrieve(
       data.id as string,
@@ -36,22 +38,29 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
     const customer = (await stripe.customers.retrieve(
       subscription.customer as string,
     )) as Stripe.Customer
+    console.log("Customer:", customer)
 
     const productId = subscription.items.data[0]?.price?.product as string
+    console.log("Product ID:", productId)
 
     const invoice = subscription.latest_invoice as Stripe.Invoice
+    console.log("Invoice:", invoice)
 
     const trxId = (invoice as any)?.payment_intent as string
+    console.log("Transaction ID:", trxId)
 
     const amountPaid = (invoice?.total || 0) / 100
+    console.log("Amount Paid:", amountPaid)
 
     // Find user and pricing plan
     const user = (await User.findOne({ email: customer.email })) as any
+    console.log("User:", user)
     if (!user) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Invalid User!')
     }
 
     const plan = (await Plan.findOne({ productId })) as any
+    console.log("Plan:", plan)
     if (!plan) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Invalid Plan!')
     }

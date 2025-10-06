@@ -26,8 +26,6 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
       `Webhook signature verification failed. ${error}`,
     )
   }
-
-console.log("Event type:", event.type)
   // Check if the event is valid
   if (!event) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid event received!')
