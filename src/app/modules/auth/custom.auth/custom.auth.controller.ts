@@ -75,7 +75,7 @@ const verifyAccount = catchAsync(async (req: Request, res: Response) => {
     statusCode: status,
     success: true,
     message: message,
-    data: { accessToken, role },
+    data: { accessToken, role, token },
   })
 })
 
