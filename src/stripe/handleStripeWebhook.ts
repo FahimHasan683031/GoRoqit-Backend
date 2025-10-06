@@ -26,8 +26,7 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
       `Webhook signature verification failed. ${error}`,
     )
   }
-  console.log("Event:", event)
-  console.log("Event data:", event.data.object)
+
 console.log("Event type:", event.type)
   // Check if the event is valid
   if (!event) {
