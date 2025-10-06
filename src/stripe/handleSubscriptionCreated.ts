@@ -65,7 +65,7 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Invalid Plan!')
     }
     const currentPeriodStart = subscription.start_date
-      ? new Date(subscription.start_date * 1000).toISOString()
+      ? new Date(subscription.start_date * 1000)
       : null
 
     let currentPeriodEnd = null
@@ -79,7 +79,7 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       else if (planInterval === 'year')
         start.setFullYear(start.getFullYear() + intervalCount)
 
-      currentPeriodEnd = start.toISOString()
+      currentPeriodEnd = start
     }
 
     const payload = {
@@ -93,6 +93,7 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       currentPeriodStart,
       currentPeriodEnd,
     }
+    console.log("Payload:", payload)
 
     await createNewSubscription(payload)
 
