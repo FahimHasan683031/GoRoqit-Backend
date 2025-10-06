@@ -9,6 +9,8 @@ import { handleSubscriptionCreated } from './handleSubscriptionCreated'
 import ApiError from '../errors/ApiError'
 
 const handleStripeWebhook = async (req: Request, res: Response) => {
+  console.log("Hit stripe webhook")
+  console.log("Hit stripe webhook")
   // Extract Stripe signature and webhook secret
   const signature = req.headers['stripe-signature'] as string
   const webhookSecret = config.stripe.webhookSecret as string
@@ -39,6 +41,7 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
   try {
     switch (eventType) {
       case 'customer.subscription.created':
+        console.log("Event type:", eventType)
     //   case 'customer.subscription.updated':
         await handleSubscriptionCreated(data as Stripe.Subscription)
         break
