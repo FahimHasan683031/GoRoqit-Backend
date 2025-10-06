@@ -9,7 +9,7 @@ export const checkAndUpdateExpiredSubscriptions = async (): Promise<void> => {
 
     const expiredSubscriptions = await Subscription.find({
       status: 'active',
-      currentPeriodEnd: { $lt: now.toISOString() }
+      currentPeriodEnd: { $lt: now }
     });
     
 
@@ -22,6 +22,7 @@ export const checkAndUpdateExpiredSubscriptions = async (): Promise<void> => {
         );
  
         await User.findOneAndUpdate(
+          { _id: subscription.user },
           { subscribe: false }
         );
         

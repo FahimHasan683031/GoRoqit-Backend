@@ -49,6 +49,7 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
 
     const amountPaid = (invoice?.total || 0) / 100
 
+    console.log("subscription:", subscription)
 
     // Find user and pricing plan
     const user = (await User.findOne({ email: customer.email })) as any
@@ -71,6 +72,8 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       // Use plan interval to calculate end date
       const planInterval = plan.interval || 'month' // 'month' or 'year'
       const intervalCount = plan.interval_count || 1
+      console.log("planInterval:", planInterval)
+      console.log("intervalCount:", intervalCount)
       const start = new Date(subscription.start_date * 1000)
       if (planInterval === 'month')
         start.setMonth(start.getMonth() + intervalCount)
@@ -88,6 +91,7 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       trxId,
       subscriptionId: subscription.id,
       status: 'active',
+      invoice,
       currentPeriodStart,
       currentPeriodEnd,
     }

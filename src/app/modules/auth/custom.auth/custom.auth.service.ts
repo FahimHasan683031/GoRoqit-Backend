@@ -520,7 +520,7 @@ const deleteAccount = async (user: JwtPayload, password:string) => {
 
 const resendOtp = async (email:string, authType:'createAccount' | 'resetPassword') => {
 
-  console.log({email, authType})
+
   const isUserExist = await User.findOne({
     email: email.toLowerCase().trim(),
     status: { $in: [USER_STATUS.ACTIVE, USER_STATUS.RESTRICTED] },
