@@ -6,7 +6,6 @@ import { Plan } from '../app/modules/plan/plan.model'
 import stripe from '../config/stripe'
 import ApiError from '../errors/ApiError'
 
-
 // Helper function to create new subscription in database
 const createNewSubscription = async (payload: any) => {
   const isExistSubscription = await Subscription.findOne({
@@ -37,19 +36,13 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       subscription.customer as string,
     )) as Stripe.Customer
 
-
     const productId = subscription.items.data[0]?.price?.product as string
-
 
     const invoice = subscription.latest_invoice as Stripe.Invoice
 
-
     const trxId = (invoice as any)?.payment_intent as string
 
-
     const amountPaid = (invoice?.total || 0) / 100
-
-   
 
     // Find user and pricing plan
     const user = (await User.findOne({ email: customer.email })) as any
@@ -67,21 +60,51 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       ? new Date(subscription.start_date * 1000)
       : null
 
+    // let currentPeriodEnd = null
+    // if (subscription.start_date) {
+    //   // Use plan interval to calculate end date
+    //   const planInterval = plan.interval || 'month' // 'month' or 'year'
+    //   const intervalCount = plan.interval_count || 1
+    //   console.log("planInterval:", planInterval)
+    //   console.log("intervalCount:", intervalCount)
+    //   const start = new Date(subscription.start_date * 1000)
+    //   if (planInterval === 'month')
+    //     start.setMonth(start.getMonth() + intervalCount)
+    //   else if (planInterval === 'year')
+    //     start.setFullYear(start.getFullYear() + intervalCount)
+
+    //   currentPeriodEnd = start
+    // }
+
     let currentPeriodEnd = null
-    if (subscription.start_date) {
-      // Use plan interval to calculate end date
-      const planInterval = plan.interval || 'month' // 'month' or 'year'
-      const intervalCount = plan.interval_count || 1
-      console.log("planInterval:", planInterval)
-      console.log("intervalCount:", intervalCount)
-      const start = new Date(subscription.start_date * 1000)
-      if (planInterval === 'month')
-        start.setMonth(start.getMonth() + intervalCount)
-      else if (planInterval === 'year')
-        start.setFullYear(start.getFullYear() + intervalCount)
+
+    if (subscription.start_date && plan.duration) {
+      const start = new Date(subscription.start_date * 1000) 
+
+      const [durationValue, durationUnit] = plan.duration.split(' ')
+
+      const count = parseInt(durationValue)
+
+      switch (durationUnit) {
+        case 'month':
+        case 'months':
+          start.setMonth(start.getMonth() + count)
+          break
+
+        case 'year':
+        case 'years':
+          start.setFullYear(start.getFullYear() + count)
+          break
+
+        default:
+          console.warn('Unknown plan duration:', plan.duration)
+          break
+      }
 
       currentPeriodEnd = start
     }
+
+    console.log('currentPeriodEnd:', currentPeriodEnd)
 
     const payload = {
       customerId: customer.id,
@@ -95,10 +118,9 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       currentPeriodEnd,
     }
 
-
     await createNewSubscription(payload)
 
-   await User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
       { _id: user._id },
       { subscribe: true },
       { new: true },
@@ -108,4 +130,3 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
     return error
   }
 }
-
