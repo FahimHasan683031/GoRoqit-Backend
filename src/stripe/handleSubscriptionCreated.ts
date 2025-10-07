@@ -40,6 +40,13 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
 
     const invoice = subscription.latest_invoice as Stripe.Invoice
 
+    const invoiceUrl = invoice.hosted_invoice_url // View invoice online
+    const invoicePdf = invoice.invoice_pdf // Direct link to PDF
+
+    console.log('Invoice URL:', invoiceUrl)
+    console.log('Invoice PDF:', invoicePdf)
+    console.log("invoice:", invoice)
+
     const trxId = (invoice as any)?.payment_intent as string
 
     const amountPaid = (invoice?.total || 0) / 100
@@ -60,26 +67,11 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       ? new Date(subscription.start_date * 1000)
       : null
 
-    // let currentPeriodEnd = null
-    // if (subscription.start_date) {
-    //   // Use plan interval to calculate end date
-    //   const planInterval = plan.interval || 'month' // 'month' or 'year'
-    //   const intervalCount = plan.interval_count || 1
-    //   console.log("planInterval:", planInterval)
-    //   console.log("intervalCount:", intervalCount)
-    //   const start = new Date(subscription.start_date * 1000)
-    //   if (planInterval === 'month')
-    //     start.setMonth(start.getMonth() + intervalCount)
-    //   else if (planInterval === 'year')
-    //     start.setFullYear(start.getFullYear() + intervalCount)
-
-    //   currentPeriodEnd = start
-    // }
-
+    // calcualte currentPeriodEnd
     let currentPeriodEnd = null
 
     if (subscription.start_date && plan.duration) {
-      const start = new Date(subscription.start_date * 1000) 
+      const start = new Date(subscription.start_date * 1000)
 
       const [durationValue, durationUnit] = plan.duration.split(' ')
 
@@ -103,8 +95,6 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
 
       currentPeriodEnd = start
     }
-
-    console.log('currentPeriodEnd:', currentPeriodEnd)
 
     const payload = {
       customerId: customer.id,
