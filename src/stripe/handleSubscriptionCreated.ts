@@ -40,7 +40,7 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
 
     const invoice = subscription.latest_invoice as Stripe.Invoice
 
-    const invoicePdf = invoice.invoice_pdf // Direct link to PDF
+    const invoicePdf = invoice.hosted_invoice_url // Direct link to PDF
 
 
     const trxId = (invoice as any)?.payment_intent as string
