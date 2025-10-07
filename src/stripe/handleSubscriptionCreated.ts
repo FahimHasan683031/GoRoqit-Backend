@@ -40,12 +40,8 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
 
     const invoice = subscription.latest_invoice as Stripe.Invoice
 
-    const invoiceUrl = invoice.hosted_invoice_url // View invoice online
     const invoicePdf = invoice.invoice_pdf // Direct link to PDF
 
-    console.log('Invoice URL:', invoiceUrl)
-    console.log('Invoice PDF:', invoicePdf)
-    console.log("invoice:", invoice)
 
     const trxId = (invoice as any)?.payment_intent as string
 
@@ -104,6 +100,7 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       trxId,
       subscriptionId: subscription.id,
       status: 'active',
+      invoice:invoicePdf,
       currentPeriodStart,
       currentPeriodEnd,
     }
