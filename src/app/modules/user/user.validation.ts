@@ -8,7 +8,7 @@ export const userSignupSchema = z.object({
   companyName: z.string().optional(),
   role: z.nativeEnum(USER_ROLES),
   image: z.string().optional(),
-  password: z.string().min(8),
+  password: z.string().min(6),
  })
 });
 
@@ -22,7 +22,6 @@ export const userUpdateSchema = z.object({
   name: z.string().optional(),
   password: z.string().min(6).optional(),
   status: z.nativeEnum(USER_STATUS).optional(),
-  
   verified: z.boolean().optional(),
   companyName: z.string().optional(),
   role: z.nativeEnum(USER_ROLES).optional(),

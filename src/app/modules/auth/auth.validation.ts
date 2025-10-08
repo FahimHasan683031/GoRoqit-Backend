@@ -39,10 +39,10 @@ const forgetPasswordZodSchema = z.object({
 
 const resetPasswordZodSchema = z.object({
   body: z.object({
-    newPassword: z.string().min(8, { message: 'Password is required' }),
+    newPassword: z.string().min(6, { message: 'Password is required' }),
     confirmPassword: z
       .string()
-      .min(8, { message: 'Confirm Password is required' }),
+      .min(6, { message: 'Confirm Password is required' }),
   }),
 })
 
@@ -61,7 +61,7 @@ const loginZodSchema = z.object({
         message: 'Invalid phone number format',
       }),
     deviceToken: z.string().min(1).optional(),
-    password: z.string(),
+    password: z.string({ message: 'Credentials are required' }).min(6, { message: 'Invalid Credentials' }),
   }),
 })
 

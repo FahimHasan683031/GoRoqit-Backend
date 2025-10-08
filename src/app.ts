@@ -59,7 +59,7 @@ app.get('/', (req: Request, res: Response) => {
         box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         max-width: 600px;
       ">
-        <img src="https://i.ibb.co.com/Kzh6JCQK/rocket.png" alt="Go Roqit" width="80" style="margin-bottom: 1rem;" />
+        <img src="https://i.ibb.co.com/mCpCVJP4/LOGO-C.png" alt="Go Roqit" width="80" style="margin-bottom: 1rem; height: 60px; width: 180px;" />
         <h1 style="
           font-size: 2.4rem;
           font-weight: 700;
