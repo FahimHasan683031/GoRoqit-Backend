@@ -17,7 +17,8 @@ router.get(
   auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER, USER_ROLES.ADMIN),
   UserController.getProfile,
 )
-router.get('/', auth(USER_ROLES.ADMIN), UserController.getAllUser),
+// router.get('/', auth(USER_ROLES.ADMIN), UserController.getAllUser),
+router.get('/', UserController.getAllUser),
   // get applicants
   router.get('/applicants', UserController.getApplicants)
 // get current user
