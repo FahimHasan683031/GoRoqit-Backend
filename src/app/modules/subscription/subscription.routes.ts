@@ -5,12 +5,12 @@ import { USER_ROLES } from "../user/user.interface";
 const router = express.Router();
 
 router.get("/", 
-     auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER),
+     auth(USER_ROLES.ADMIN),
     SubscriptionController.subscriptions
 );
 
 router.get("/my-plan", 
-    auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER), 
+    auth( USER_ROLES.RECRUITER), 
     SubscriptionController.subscriptionDetails
 );
 

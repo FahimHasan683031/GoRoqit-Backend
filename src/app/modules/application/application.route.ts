@@ -14,7 +14,6 @@ router.get(
     USER_ROLES.ADMIN,
     USER_ROLES.RECRUITER,
     USER_ROLES.APPLICANT,
-    USER_ROLES.GUEST,
   ),
   ApplicationController.getAllApplications,
 )
@@ -25,14 +24,13 @@ router.get(
     USER_ROLES.RECRUITER,
     USER_ROLES.ADMIN,
     USER_ROLES.APPLICANT,
-    USER_ROLES.GUEST,
   ),
   ApplicationController.getSingleApplication,
 )
 
 router.post(
   '/',
-  auth(USER_ROLES.APPLICANT, USER_ROLES.GUEST),
+  auth(USER_ROLES.APPLICANT),
   fileAndBodyProcessorUsingDiskStorage(),
   validateRequest(ApplicationValidations.create),
   ApplicationController.createApplication,
@@ -40,7 +38,7 @@ router.post(
 
 router.patch(
   '/:id',
-  auth(USER_ROLES.APPLICANT, USER_ROLES.GUEST),
+  auth(USER_ROLES.APPLICANT),
   fileAndBodyProcessorUsingDiskStorage(),
   validateRequest(ApplicationValidations.update),
   ApplicationController.updateApplication,
@@ -48,7 +46,7 @@ router.patch(
 
 router.delete(
   '/:id',
-  auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER, USER_ROLES.ADMIN),
+  auth(USER_ROLES.APPLICANT, USER_ROLES.ADMIN),
   ApplicationController.deleteApplication,
 )
 

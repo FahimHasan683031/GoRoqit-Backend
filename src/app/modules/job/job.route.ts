@@ -11,19 +11,11 @@ const router = express.Router();
 
 router.get(
   '/',
-  // auth(
-  //   USER_ROLES.ADMIN,
-  //   USER_ROLES.RECRUITER
-  // ),
   JobController.getAllJobs
 );
 
 router.get(
   '/:id',
-  // auth(
-  //    USER_ROLES.ADMIN,
-  //   USER_ROLES.RECRUITER
-  // ),
   JobController.getSingleJob
 );
 
@@ -32,8 +24,6 @@ router.post(
   auth(
      USER_ROLES.ADMIN,
     USER_ROLES.RECRUITER,
-    USER_ROLES.APPLICANT,
-    USER_ROLES.GUEST
   ),
   validateJobCreation,
   validateRequest(JobValidations.createJobZodSchema),
@@ -42,10 +32,10 @@ router.post(
 
 router.patch(
   '/:id',
-  // auth(
-  //   USER_ROLES.ADMIN,
-  //   USER_ROLES.RECRUITER
-  // ),
+  auth(
+    USER_ROLES.ADMIN,
+    USER_ROLES.RECRUITER
+  ),
   
   validateRequest(JobValidations.updateJobZodSchema),
   JobController.updateJob
@@ -53,10 +43,10 @@ router.patch(
 
 router.delete(
   '/:id',
-  // auth(
-  //    USER_ROLES.ADMIN,
-  //   USER_ROLES.RECRUITER
-  // ),
+  auth(
+     USER_ROLES.ADMIN,
+    USER_ROLES.RECRUITER
+  ),
   JobController.deleteJob
 );
 

@@ -7,7 +7,7 @@ import { createStripeProductCatalog } from '../../../stripe/createStripeProductC
 import ApiError from '../../../errors/ApiError'
 import { deleteStripeProductCatalog } from '../../../stripe/deleteStripeProductCatalog'
 import { Subscription } from '../subscription/subscription.model'
-
+// Create plan in DB and Stripe Product
 const createPlanToDB = async (payload: IPlan): Promise<IPlan | null> => {
   const productPayload = {
     title: payload.title,
@@ -39,7 +39,7 @@ const createPlanToDB = async (payload: IPlan): Promise<IPlan | null> => {
 
   return result
 }
-
+// Update plan in DB and Stripe Product
 const updatePlanToDB = async (
   id: string,
   payload: Partial<IPlan>,
@@ -110,7 +110,7 @@ const updatePlanToDB = async (
 
   return result
 }
-
+// Get plan from DB
 const getPlanFromDB = async (paymentType: string) => {
   const query: any = {
     status: 'Active',
@@ -139,7 +139,7 @@ const getPlanFromDB = async (paymentType: string) => {
     meta,
   }
 }
-
+// Get plan details from DB
 const getPlanDetailsFromDB = async (id: string): Promise<IPlan | null> => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid ID')
@@ -148,6 +148,7 @@ const getPlanDetailsFromDB = async (id: string): Promise<IPlan | null> => {
   return result
 }
 
+// Delete plan from DB and Stripe
 const deletePlanToDB = async (id: string): Promise<IPlan | null> => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid ID')

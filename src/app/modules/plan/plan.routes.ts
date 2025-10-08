@@ -8,22 +8,22 @@ const router = express.Router()
 
 router.route("/")
     .post(
-        auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER),
+        auth(USER_ROLES.ADMIN),
         validateRequest(createPlanZodValidationSchema),
         PlanController.createPlan
     )
     .get(
-         auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER),
+         auth(USER_ROLES.ADMIN, USER_ROLES.RECRUITER),
         PlanController.getPlan
     )
 
 router
     .route("/:id")
     .patch( 
-        auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER),
+        auth(USER_ROLES.ADMIN),
         validateRequest(updatePlanZodValidationSchema),
         PlanController.updatePlan
     )
-    .delete( auth(USER_ROLES.ADMIN, USER_ROLES.APPLICANT, USER_ROLES.RECRUITER), PlanController.deletePlan)
+    .delete( auth(USER_ROLES.ADMIN), PlanController.deletePlan)
 
 export const PlanRoutes = router;

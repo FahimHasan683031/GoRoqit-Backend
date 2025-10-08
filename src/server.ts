@@ -3,14 +3,9 @@ import mongoose from 'mongoose'
 import { Server } from 'socket.io'
 import app from './app'
 import config from './config'
-
 import { errorLogger, logger } from './shared/logger'
 import { socketHelper } from './helpers/socketHelper'
 import { UserServices } from './app/modules/user/user.service'
-// import { redisClient } from './helpers/redis'
-// import { createAdapter } from "@socket.io/redis-adapter";
-// import { emailWorker, notificationWorker } from './helpers/bull-mq-worker'
-//uncaught exception
 process.on('uncaughtException', error => {
   errorLogger.error('UnhandledException Detected', error)
   process.exit(1)
@@ -33,12 +28,6 @@ async function main() {
 
     })
        
-    //   server = app.listen(port, () => {
-    //   logger.info(
-    //     colors.yellow(`♻️  Application listening on port:${config.port}`),
-    //   )
-    // })
-
     //socket
     const io = new Server(server, {
       pingTimeout: 60000,
@@ -50,16 +39,8 @@ async function main() {
     //create admin user
     await UserServices.createAdmin()
 
-    //bull mq notification worker!!!!!
-    // notificationWorker
-    // emailWorker
-
-    // const pubClient = redisClient
-    // const subClient = pubClient.duplicate()
-
     logger.info(colors.green('🍁 Server connected successfully'))
 
-    // io.adapter(createAdapter(pubClient, subClient))
     socketHelper.socket(io)
     //@ts-ignore
     global.io = io
@@ -67,7 +48,6 @@ async function main() {
     errorLogger.error(colors.red('🤢 Failed to connect Database'))
     config.node_env === 'development' && console.log(error)
   }
-
   //handle unhandleRejection
   process.on('unhandledRejection', error => {
     if (server) {
@@ -80,13 +60,10 @@ async function main() {
     }
   })
 }
-
 main()
 
 //SIGTERM
 process.on('SIGTERM', async () => {
-  // await notificationWorker.close();
-  // await emailWorker.close();
   logger.info('SIGTERM IS RECEIVE')
   if (server) {
     server.close()

@@ -10,7 +10,6 @@ import handleStripeWebhook from './stripe/handleStripeWebhook';
 
 const app = express();
 
-
 app.use(
   cors({
     origin: '*',
@@ -24,12 +23,10 @@ app.use('/webhook',
     handleStripeWebhook
 );
 
-
 //morgan
 app.use(Morgan.successHandler)
 app.use(Morgan.errorHandler)
 //body parser
-
 app.use(express.json())
 app.use(passport.initialize())
 app.use(express.urlencoded({ extended: true }))
@@ -43,28 +40,66 @@ app.use('/api/v1', router)
 //live response
 app.get('/', (req: Request, res: Response) => {
   res.send(`
-    <div style="
+   <div style="
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      background: radial-gradient(circle at top left, #1e003e, #5e00a5);
-      color: #fff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      text-align: center;
-      padding: 2rem;
+      background: linear-gradient(135deg, #e8f5e9, #f1f8f6);
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1b4332;
+      margin: 0;
     ">
-      <div>
-        <h1 style="font-size: 3rem; margin-bottom: 1rem;">
-          🛑 Whoa there, hacker man.
+      <div style="
+        text-align: center;
+        background: #ffffffd9;
+        border: 1px solid #d9ead3;
+        border-radius: 16px;
+        padding: 3rem 2.5rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        max-width: 600px;
+      ">
+        <img src="https://i.ibb.co.com/Kzh6JCQK/rocket.png" alt="Go Roqit" width="80" style="margin-bottom: 1rem;" />
+        <h1 style="
+          font-size: 2.4rem;
+          font-weight: 700;
+          margin-bottom: 0.8rem;
+          color: #1b4332;
+        ">
+          👋 Welcome to Go Roqit API
         </h1>
-        <p style="font-size: 1.4rem; line-height: 1.6;">
-          You really just typed <code style="color:#ffd700;">'/'</code> in your browser and expected magic?<br><br>
-          This isn’t Hogwarts, and you’re not the chosen one. 🧙‍♂️<br><br>
-          Honestly, even my 404 page gets more action than this route. 💀
+
+        <p style="
+          font-size: 1.15rem;
+          line-height: 1.7;
+          color: #2d6a4f;
+        ">
+          You’ve reached the <code style="color:#40916c;">root</code> of the Go Roqit server.<br>
+          Everything’s running smoothly and securely. ✅<br><br>
+          Explore the API endpoints or head back to the app for takeoff. 🚀
         </p>
-        <p style="margin-top: 2rem; font-size: 1rem; opacity: 0.7;">
-          Now go back... and try something useful. Or not. I’m just a server.
+
+        <a href="https://goroqit.com" target="_blank" style="
+          display: inline-block;
+          margin-top: 1.8rem;
+          padding: 0.8rem 1.6rem;
+          border-radius: 10px;
+          background: #2d6a4f;
+          color: #fff;
+          text-decoration: none;
+          font-weight: 600;
+          transition: background 0.3s ease;
+        " onmouseover="this.style.background='#1b4332'" onmouseout="this.style.background='#2d6a4f'">
+          🌐 Visit Go Roqit App
+        </a>
+
+        <p style="
+          margin-top: 2rem;
+          font-size: 0.9rem;
+          color: #52796f;
+        ">
+          © ${new Date().getFullYear()} — Go Roqit Server<br>
+          Built with 💚 and innovation
         </p>
       </div>
     </div>
@@ -74,26 +109,24 @@ app.get('/', (req: Request, res: Response) => {
 
 //global error handle
 app.use(globalErrorHandler)
-
-
 app.use((req, res) => {
   res.status(StatusCodes.NOT_FOUND).json({
     success: false,
-    message: 'Lost, are we?',
+    message: "Endpoint not found 🚫",
     errorMessages: [
       {
         path: req.originalUrl,
-        message: "Congratulations, you've reached a completely useless API endpoint 👏",
+        message: "Looks like you’ve taken a wrong turn — this route doesn’t exist on the Go Roqit API.",
       },
       {
-        path: '/docs',
-        message: "Hint: Maybe try reading the docs next time? 📚",
+        path: "/api/v1/docs",
+        message: "Need directions? Check out our API documentation for valid endpoints. 📘",
       },
     ],
-    roast: "404 brain cells not found. Try harder. 🧠❌",
+    tip: "Pro Tip 💡: Always double-check your endpoint URL, HTTP method, and version prefix before sending requests.",
+    roast: "It’s okay, even rockets miss their trajectory sometimes. 🚀 Adjust course and try again!",
     timestamp: new Date().toISOString(),
   });
 });
-
 
 export default app
