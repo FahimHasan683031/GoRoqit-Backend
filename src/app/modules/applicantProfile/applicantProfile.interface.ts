@@ -48,6 +48,7 @@ export type IApplicantProfile = {
   city?: string;
   zipCode?: string;
   province?: string;
+  yearsOfExperience?: string;
   mobile?: string;
   landLine?: string;
   bio?: string;

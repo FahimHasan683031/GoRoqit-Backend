@@ -59,6 +59,7 @@ export const ApplicantProfileUpdateSchema = z.object({
   previousEmployment: z.enum(["Yes", "No"]).optional(),
   streetAddress: z.string().optional(),
   country: z.string().optional(),
+  yearsOfExperience: z.string().optional(),
   city: z.string().optional(),
   zipCode: z.string().optional(),
   province: z.string().optional(),

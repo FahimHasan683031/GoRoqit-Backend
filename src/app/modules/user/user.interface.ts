@@ -69,6 +69,7 @@ export interface IUpdateProfilePayload {
   facebookProfile?: string;
   instagramProfile?: string;
   firstName?: string;
+  yearsOfExperience?: string;
   image?: string;
   lastName?: string;
   resume?: string;
