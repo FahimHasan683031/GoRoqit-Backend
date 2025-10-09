@@ -1,6 +1,7 @@
 import { ICreateAccount, IResetPassword } from '../interfaces/emailTemplate'
 
 const createAccount = (values: ICreateAccount) => {
+  console.log(values, 'values')
   const data = {
     to: values.email,
     subject: `Verify your account, ${values.name}`,
@@ -83,6 +84,7 @@ const createAccount = (values: ICreateAccount) => {
 }
 
 const resetPassword = (values: IResetPassword) => {
+  console.log(values, 'values')
   const data = {
     to: values.email,
     subject: `Reset your password, ${values.name}`,
@@ -172,6 +174,7 @@ const resendOtp = (values: {
   otp: string
   type: 'resetPassword' | 'createAccount'
 }) => {
+  console.log(values, 'values')
   const isReset = values.type === 'resetPassword'
 
   const data = {
