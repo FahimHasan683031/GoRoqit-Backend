@@ -248,7 +248,7 @@ const resetPassword = async (resetToken: string, payload: IResetPassword) => {
   if (!isUserExist) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'Something went wrong, please try again. or contact support.',
+      'Requested user not found, please try again. or contact support.',
     )
   }
 

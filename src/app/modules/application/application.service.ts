@@ -181,7 +181,7 @@ const deleteApplication = async (id: string): Promise<IApplication> => {
   if (!result) {
     throw new ApiError(
       StatusCodes.NOT_FOUND,
-      'Something went wrong while deleting Application, please try again with valid id.',
+      'Requested Application not found while deleting Application, please try again with valid id.',
     )
   }
 

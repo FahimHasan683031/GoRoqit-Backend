@@ -17,8 +17,8 @@ router.get(
   auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER, USER_ROLES.ADMIN),
   UserController.getProfile,
 )
-// router.get('/', auth(USER_ROLES.ADMIN), UserController.getAllUser),
-router.get('/', UserController.getAllUser),
+router.get('/', auth(USER_ROLES.ADMIN), UserController.getAllUser),
+
   // get applicants
   router.get('/applicants', UserController.getApplicants)
 // get current user
@@ -33,6 +33,6 @@ router.get('/:id', UserController.getSingleUser)
 
 router.patch('/:id/role', UserController.updateUserRoleAndCreateProfile)
 // delete user
-router.delete('/:id', UserController.deleteUser)
+router.delete('/:id', auth(USER_ROLES.ADMIN), UserController.deleteUser)
 
 export const UserRoutes = router

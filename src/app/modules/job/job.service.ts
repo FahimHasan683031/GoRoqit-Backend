@@ -144,7 +144,7 @@ const deleteJob = async (id: string): Promise<IJob> => {
   if (!result) {
     throw new ApiError(
       StatusCodes.NOT_FOUND,
-      'Something went wrong while deleting job, please try again with valid id.',
+      'Requested job not found while deleting job, please try again with valid id.',
     )
   }
 
