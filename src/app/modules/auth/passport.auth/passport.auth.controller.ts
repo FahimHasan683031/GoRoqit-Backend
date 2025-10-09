@@ -40,12 +40,12 @@ const googleAuthCallback = catchAsync(async (req: Request, res: Response) => {
     req.user as IUser & { profile: any },
   )
   const { status, message, accessToken, refreshToken, role } = result
-  sendResponse(res, {
-    statusCode: status,
-    success: true,
-    message: message,
-    data: { accessToken, role },
-  })
+  res.cookie("refreshToken", refreshToken, {
+    secure: config.node_env === "production",
+    httpOnly: true,
+  });
+  res.redirect(config.google_redirect_url ? `${config.google_redirect_url}?accessToken=${accessToken}&refreshToken=${refreshToken}&role=${role}` : "https://goroqit.com")
+ 
 })
 
 export const PassportAuthController = {

@@ -27,6 +27,7 @@ router.get(
   auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER, USER_ROLES.ADMIN),
   UserController.getCurrentUser,
 )
+
 // get single user
 router.get('/:id', UserController.getSingleUser)
 // update user role and create profile

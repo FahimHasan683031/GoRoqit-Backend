@@ -12,6 +12,7 @@ import { ChatRoutes } from '../app/modules/chat/chat.routes'
 import { MessageRoutes } from '../app/modules/message/message.routes'
 import { categoryRoutes } from '../app/modules/category/category.route'
 import { DashboardRoutes } from '../app/modules/dashboard/dashboard.rout'
+import { newsletterRoutes } from '../app/modules/newsletter/newsletter.route'
 
 const router = express.Router()
 
@@ -29,6 +30,7 @@ const apiRoutes: { path: string; route: Router }[] = [
   { path: '/message', route: MessageRoutes },
   { path: '/category', route: categoryRoutes },
   { path: '/dashboard', route: DashboardRoutes },
+  { path: '/newsletter', route: newsletterRoutes },
 ]
 
 apiRoutes.forEach(route => {
