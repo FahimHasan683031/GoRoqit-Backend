@@ -45,6 +45,7 @@ const createAdmin = async (): Promise<Partial<IUser> | null> => {
   if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create admin')
   }
+  logger.log('info', 'Admin account created successfully.')
   return result[0]
 }
 

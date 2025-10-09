@@ -45,7 +45,7 @@ async function main() {
     //@ts-ignore
     global.io = io
   } catch (error) {
-    errorLogger.error(colors.red('🤢 Failed to connect Database'))
+    errorLogger.error(colors.red('Server Failed to connect Database'))
     config.node_env === 'development' && console.log(error)
   }
   //handle unhandleRejection
