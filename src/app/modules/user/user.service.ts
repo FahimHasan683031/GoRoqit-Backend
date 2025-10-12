@@ -258,11 +258,6 @@ const getApplicants = async (query: Record<string, unknown>) => {
   };
 }
 
-const deleteProfile = async (id: string) => {
-
-  const res = await ApplicantProfile.findByIdAndDelete(id)
-  return res
-}
 
 
 
@@ -275,6 +270,5 @@ export const UserServices = {
   deleteUser,
   getProfile,
   getApplicants,
-  getCurrentUser,
-  deleteProfile
+  getCurrentUser
 }

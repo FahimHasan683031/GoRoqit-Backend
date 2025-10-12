@@ -107,16 +107,6 @@ const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-// delete profile
-const deleteProfile = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserServices.deleteProfile(req.params.id)
-  sendResponse<IApplicantProfile>(res, {
-    statusCode: StatusCodes.OK,
-    success: true,
-    message: 'Profile deleted successfully',
-    data: result,
-  })
-})
 
 
 
@@ -128,6 +118,5 @@ export const UserController = {
   updateUserRoleAndCreateProfile,
   getProfile,
   getApplicants,
-  getCurrentUser,
-  deleteProfile
+  getCurrentUser
 }

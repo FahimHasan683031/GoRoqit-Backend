@@ -27,8 +27,6 @@ router.get(
   auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER, USER_ROLES.ADMIN),
   UserController.getCurrentUser,
 )
-// delete profile
-router.delete('/profile/:id', auth(USER_ROLES.APPLICANT), UserController.deleteProfile)
 
 // get single user
 router.get('/:id', UserController.getSingleUser)
