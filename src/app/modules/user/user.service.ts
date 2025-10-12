@@ -140,7 +140,16 @@ const updateUserRoleAndCreateProfile = async (
 
 // delete User
 const deleteUser = async (id: string) => {
+  const user = await User.findById(id)
+  if (!user) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+  }
   const result = await User.findByIdAndDelete(id)
+  if(user.role === USER_ROLES.APPLICANT) {
+    await ApplicantProfile.findByIdAndDelete(user.profile)
+  } else if(user.role === USER_ROLES.RECRUITER) {
+    await RecruiterProfile.findByIdAndDelete(user.profile)
+  }
   return result
 }
 
@@ -249,6 +258,12 @@ const getApplicants = async (query: Record<string, unknown>) => {
   };
 }
 
+const deleteProfile = async (id: string) => {
+
+  const res = await ApplicantProfile.findByIdAndDelete(id)
+  return res
+}
+
 
 
 export const UserServices = {
@@ -260,5 +275,6 @@ export const UserServices = {
   deleteUser,
   getProfile,
   getApplicants,
-  getCurrentUser
+  getCurrentUser,
+  deleteProfile
 }
