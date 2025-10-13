@@ -7,21 +7,27 @@ import stripe from '../config/stripe'
 import ApiError from '../errors/ApiError'
 
 // Helper function to create new subscription in database
+
 const createNewSubscription = async (payload: any) => {
-  const isExistSubscription = await Subscription.findOne({
-    user: payload.user,
-  })
-  if (isExistSubscription) {
-    await Subscription.findByIdAndUpdate(
-      { _id: isExistSubscription._id },
-      payload,
-      { new: true },
-    )
-  } else {
-    const newSubscription = new Subscription(payload)
-    await newSubscription.save()
-  }
+  const newSubscription = new Subscription(payload)
+  await newSubscription.save()
 }
+
+// const createNewSubscription = async (payload: any) => {
+//   const isExistSubscription = await Subscription.findOne({
+//     user: payload.user,
+//   })
+//   if (isExistSubscription) {
+//     await Subscription.findByIdAndUpdate(
+//       { _id: isExistSubscription._id },
+//       payload,
+//       { new: true },
+//     )
+//   } else {
+//     const newSubscription = new Subscription(payload)
+//     await newSubscription.save()
+//   }
+// }
 
 export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
   try {
@@ -41,7 +47,6 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
     const invoice = subscription.latest_invoice as Stripe.Invoice
 
     const invoicePdf = invoice.hosted_invoice_url // Direct link to PDF
-
 
     const trxId = (invoice as any)?.payment_intent as string
 
@@ -100,7 +105,7 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       trxId,
       subscriptionId: subscription.id,
       status: 'active',
-      invoice:invoicePdf,
+      invoice: invoicePdf,
       currentPeriodStart,
       currentPeriodEnd,
     }
