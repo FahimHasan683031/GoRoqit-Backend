@@ -13,22 +13,6 @@ const createNewSubscription = async (payload: any) => {
   await newSubscription.save()
 }
 
-// const createNewSubscription = async (payload: any) => {
-//   const isExistSubscription = await Subscription.findOne({
-//     user: payload.user,
-//   })
-//   if (isExistSubscription) {
-//     await Subscription.findByIdAndUpdate(
-//       { _id: isExistSubscription._id },
-//       payload,
-//       { new: true },
-//     )
-//   } else {
-//     const newSubscription = new Subscription(payload)
-//     await newSubscription.save()
-//   }
-// }
-
 export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
   try {
     // Retrieve subscription details from Stripe
