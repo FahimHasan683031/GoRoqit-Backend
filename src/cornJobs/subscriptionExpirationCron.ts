@@ -11,6 +11,5 @@ const subscriptionCron = cron.schedule('0 0 * * *', async () => {
 // Start the job
 subscriptionCron.start();
 
-console.log('✅ Subscription expiration cron initialized');
 
 export default subscriptionCron;

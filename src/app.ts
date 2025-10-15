@@ -15,6 +15,7 @@ const app = express();
 const allowedOrigins = [
   'https://goroqit.com',
   'http://localhost:3000',
+  "http://10.10.7.45:3000"
 ];
 
 app.use(

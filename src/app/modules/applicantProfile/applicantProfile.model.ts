@@ -72,7 +72,7 @@ const ApplicantProfileSchema = new Schema<IApplicantProfile>(
     mobile: { type: String, default: null },
     yearsOfExperience: { type: String, default: null },
     landLine: { type: String, default: null },
-    bio: { type: String, maxlength: 500, default: null },
+    bio: { type: String, default: null },
   },
   { timestamps: true }
 );
