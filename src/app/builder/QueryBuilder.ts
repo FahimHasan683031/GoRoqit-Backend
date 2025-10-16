@@ -28,46 +28,48 @@ class QueryBuilder<T> {
   }
 
   // Filtering
-  filter() {
-    const queryObj = { ...this.query }
-    const excludeFields = [
-      'searchTerm',
-      'sort',
-      'page',
-      'limit',
-      'fields',
-      'withLocked',
-      'showHidden',
-      'download',
-    ]
-    excludeFields.forEach(el => delete queryObj[el])
+// Filtering
+filter() {
+  const queryObj = { ...this.query }
+  const excludeFields = [
+    'searchTerm',
+    'sort',
+    'page',
+    'limit',
+    'fields',
+    'withLocked',
+    'showHidden',
+    'download',
+  ]
+  excludeFields.forEach(el => delete queryObj[el])
 
-    // Handle salary range filtering
-    if (queryObj.minSalary || queryObj.maxSalary) {
-      const salaryFilter: Record<string, any> = {}
+  const filters: Record<string, any> = cleanObject(queryObj)
 
-      if (queryObj.minSalary) {
-        salaryFilter.minSalary = { $gte: Number(queryObj.minSalary) }
-        delete queryObj.minSalary
-      }
-
-      if (queryObj.maxSalary) {
-        salaryFilter.maxSalary = { $lte: Number(queryObj.maxSalary) }
-        delete queryObj.maxSalary
-      }
-
-      this.modelQuery = this.modelQuery.find({
-        ...cleanObject(queryObj),
-        ...salaryFilter,
-      } as FilterQuery<T>)
-    } else {
-      this.modelQuery = this.modelQuery.find(
-        cleanObject(queryObj) as FilterQuery<T>,
-      )
+  // Handle salary range filtering
+  if (queryObj.minSalary || queryObj.maxSalary) {
+    if (queryObj.minSalary) {
+      filters.minSalary = { $gte: Number(queryObj.minSalary) }
+      delete queryObj.minSalary
     }
-
-    return this
+    if (queryObj.maxSalary) {
+      filters.maxSalary = { $lte: Number(queryObj.maxSalary) }
+      delete queryObj.maxSalary
+    }
   }
+
+  // ✅ Add partial match for jobLocation
+  if (this.query.jobLocation) {
+    filters.jobLocation = {
+      $regex: this.query.jobLocation,
+      $options: 'i', // case-insensitive
+    }
+  }
+
+  this.modelQuery = this.modelQuery.find(filters as FilterQuery<T>)
+  return this
+}
+
+
 
   // Sorting
   sort() {
