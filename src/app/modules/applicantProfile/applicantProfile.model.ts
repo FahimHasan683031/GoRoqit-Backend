@@ -13,6 +13,7 @@ const EducationSchema = new Schema<IEducation>(
     duration: String,
     yearOfPassing: Number,
     cgpa: Number,
+    certificate: { type: String, default: null },
   },
   { _id: false }
 );

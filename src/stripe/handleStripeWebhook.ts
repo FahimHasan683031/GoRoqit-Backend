@@ -1,59 +1,46 @@
-import { Request, Response } from 'express'
-import Stripe from 'stripe'
-import colors from 'colors'
-import { StatusCodes } from 'http-status-codes'
-import { logger } from '../shared/logger'
-import config from '../config'
-import stripe from '../config/stripe'
-import { handleSubscriptionCreated } from './handleSubscriptionCreated'
-import ApiError from '../errors/ApiError'
+import { Request, Response } from "express";
+import Stripe from "stripe";
+import { StatusCodes } from "http-status-codes";
+import config from "../config";
+import stripe from "../config/stripe";
+import ApiError from "../errors/ApiError";
+import { handleSubscriptionCreated } from "./handleSubscriptionCreated";
+import { logger } from "../shared/logger";
 
 const handleStripeWebhook = async (req: Request, res: Response) => {
+  console.log("hit stripe webhook");
+  const signature = req.headers["stripe-signature"] as string;
+  const webhookSecret = config.stripe.webhookSecret as string;
+  let event: Stripe.Event;
 
-  // Extract Stripe signature and webhook secret
-  const signature = req.headers['stripe-signature'] as string
-  const webhookSecret = config.stripe.webhookSecret as string
-
-  let event: Stripe.Event | undefined
-
-  // Verify the event signature
   try {
-    event = stripe.webhooks.constructEvent(req.body, signature, webhookSecret)
+    event = stripe.webhooks.constructEvent(req.body, signature, webhookSecret);
   } catch (error) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      `Webhook signature verification failed. ${error}`,
-    )
-  }
-  // Check if the event is valid
-  if (!event) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid event received!')
+    throw new ApiError(StatusCodes.BAD_REQUEST, `Webhook verification failed: ${error}`);
   }
 
-  // Extract event data and type
-  const data = event.data.object as Stripe.Subscription | Stripe.Account
-  const eventType = event.type
+  const data = event.data.object as any;
+  const eventType = event.type;
 
-
-  // Handle the event based on its type
   try {
     switch (eventType) {
-      case 'customer.subscription.created':
-    //   case 'customer.subscription.updated':
-        await handleSubscriptionCreated(data as Stripe.Subscription)
-        break
+      case "checkout.session.completed":
+        logger.info("✅ Checkout completed:", data.id);
+        break;
+
+      case "customer.subscription.created":
+        await handleSubscriptionCreated(data as Stripe.Subscription);
+        break;
 
       default:
-        logger.warn(colors.bgGreen.bold(`Unhandled event type: ${eventType}`))
+        logger.info(`⚠️ Unhandled event type: ${eventType}`);
     }
   } catch (error) {
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      `Error handling event: ${error}`,
-    )
+    logger.error("Webhook error:", error);
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, `${error}`);
   }
 
-  res.sendStatus(200)
-}
+  res.sendStatus(200);
+};
 
-export default handleStripeWebhook
+export default handleStripeWebhook;

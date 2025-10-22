@@ -27,6 +27,12 @@ router.get(
   auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER, USER_ROLES.ADMIN),
   UserController.getCurrentUser,
 )
+// delete my account
+router.delete(
+  '/me',
+  auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER, USER_ROLES.ADMIN),
+  UserController.deleteMyAccount,
+)
 
 // get single user
 router.get('/:id', UserController.getSingleUser)
@@ -35,5 +41,7 @@ router.get('/:id', UserController.getSingleUser)
 router.patch('/:id/role', UserController.updateUserRoleAndCreateProfile)
 // delete user
 router.delete('/:id', auth(USER_ROLES.ADMIN), UserController.deleteUser)
+
+
 
 export const UserRoutes = router

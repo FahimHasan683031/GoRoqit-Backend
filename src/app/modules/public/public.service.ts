@@ -6,11 +6,9 @@ import { Contact, Faq, Public } from './public.model'
 import { User } from '../user/user.model'
 import { emailHelper } from '../../../helpers/emailHelper'
 import QueryBuilder from '../../builder/QueryBuilder'
-
-
+import { emailTemplate } from '../../../shared/emailTemplate'
 
 const createPublic = async (payload: IPublic) => {
-
   const isExist = await Public.findOne({
     type: payload.type,
   })
@@ -71,44 +69,17 @@ const createContact = async (payload: IContact) => {
       )
     }
 
-    // Send email notification to admin
-    const emailData = {
-      to: admin.email,
-      subject: 'New Contact Form Submission',
-      html: `
-        <h1>New Contact Form Submission</h1>
-        <p>You have received a new message from the contact form:</p>
-        <ul>
-          <li><strong>Name:</strong> ${payload.name}</li>
-          <li><strong>Email:</strong> ${payload.email}</li>
-          <li><strong>Phone:</strong> ${payload.phone}</li>
-        </ul>
-        <h2>Message:</h2>
-        <p>${payload.message}</p>
-        <p>You can respond directly to the sender by replying to: ${payload.email}</p>
-      `,
-    }
-
-    await emailHelper.sendEmail(emailData);
-
-    // Send confirmation email to the user
-    const userEmailData = {
-      to: payload.email,
-      subject: 'Thank you for contacting us',
-      html: `
-        <h1>Thank You for Contacting Us</h1>
-        <p>Dear ${payload.name},</p>
-        <p>We have received your message and will get back to you as soon as possible.</p>
-        <p>Here's a copy of your message:</p>
-        <p><em>${payload.message}</em></p>
-        <p>Best regards,<br>The Healthcare and Financial Consultants Team</p>
-      `,
-    }
-
-    await emailHelper.sendEmail(userEmailData);
     const result = await Contact.create(payload)
     if (!result)
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create Contact')
+    // send admin email
+    await emailHelper.sendEmail(
+      emailTemplate.adminContactNotificationEmail(payload),
+    )
+    // send user email
+    await emailHelper.sendEmail(
+      emailTemplate.userContactConfirmationEmail(payload),
+    )
 
     return {
       message: 'Contact form submitted successfully',
@@ -123,14 +94,14 @@ const createContact = async (payload: IContact) => {
 
 const getAllContacts = async (query: Record<string, unknown>) => {
   const contactQueryBuilder = new QueryBuilder(Contact.find(), query)
-  
+
   contactQueryBuilder.paginate()
-  
+
   const result = await contactQueryBuilder.modelQuery.lean()
-  
+
   // Get pagination info separately
   const paginationResult = await contactQueryBuilder.getPaginationInfo()
-  
+
   // Return clean objects without circular references
   return {
     meta: paginationResult,
@@ -143,13 +114,13 @@ const createFaq = async (payload: IFaq) => {
   if (!result)
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create Faq')
   // redisClient.del(`public:${RedisKeys.FAQ}`)
-  return result 
+  return result
 }
 
 const getAllFaqs = async () => {
   // const cachedResult = await redisClient.get(`public:${RedisKeys.FAQ}`)
   // if (cachedResult) {
-    // return JSON.parse(cachedResult)
+  // return JSON.parse(cachedResult)
   // }
   const result = await Faq.find({})
   // redisClient.setex(`public:${RedisKeys.FAQ}`, 60 * 60 * 24, JSON.stringify(result))

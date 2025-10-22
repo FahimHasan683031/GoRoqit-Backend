@@ -258,6 +258,30 @@ const getApplicants = async (query: Record<string, unknown>) => {
   };
 }
 
+const deleteMyAccount = async (user: JwtPayload) => {
+  const isExistUser = await User.findById(user.authId)
+  if (!isExistUser) {
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      'The requested profile not found or deleted.',
+    )
+  }
+  if (isExistUser.role === USER_ROLES.APPLICANT && isExistUser.profile) {
+   const res= await ApplicantProfile.findByIdAndDelete(isExistUser.profile)
+   if(res) {
+    await User.findByIdAndDelete(isExistUser._id)
+   }
+   
+
+  } else if (isExistUser.role === USER_ROLES.RECRUITER && isExistUser.profile) {
+    const res= await RecruiterProfile.findByIdAndDelete(isExistUser.profile)
+    if(res) {
+      await User.findByIdAndDelete(isExistUser._id)
+    }
+  }
+  return 'Account deleted successfully'
+}
+
 
 
 
@@ -270,5 +294,6 @@ export const UserServices = {
   deleteUser,
   getProfile,
   getApplicants,
-  getCurrentUser
+  getCurrentUser,
+  deleteMyAccount
 }

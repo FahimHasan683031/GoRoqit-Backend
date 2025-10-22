@@ -107,6 +107,15 @@ const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+// delete my account
+const deleteMyAccount = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserServices.deleteMyAccount(req.user! as JwtPayload)
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: result,
+  })
+})
 
 
 
@@ -118,5 +127,6 @@ export const UserController = {
   updateUserRoleAndCreateProfile,
   getProfile,
   getApplicants,
-  getCurrentUser
+  getCurrentUser,
+  deleteMyAccount
 }

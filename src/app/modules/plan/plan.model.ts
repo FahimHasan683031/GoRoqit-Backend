@@ -29,10 +29,10 @@ const planSchema = new Schema<IPlan, PlanModel>(
             type: String,
             required: true
         },
-        paymentLink: {
-            type: String,
-            required: true
-        },
+        // paymentLink: {
+        //     type: String,
+        //     required: true
+        // },
         priceId: {
             type: String,
             required: true

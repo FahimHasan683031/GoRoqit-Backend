@@ -60,6 +60,8 @@ const deletePlan = catchAsync(async(req: Request, res: Response)=>{
     })
 })
 
+
+
 export const PlanController = {
     createPlan,
     updatePlan,

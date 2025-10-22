@@ -5,83 +5,71 @@ import { Subscription } from '../app/modules/subscription/subscription.model'
 import { Plan } from '../app/modules/plan/plan.model'
 import stripe from '../config/stripe'
 import ApiError from '../errors/ApiError'
-
-// Helper function to create new subscription in database
-
-const createNewSubscription = async (payload: any) => {
-  const newSubscription = new Subscription(payload)
-  await newSubscription.save()
-}
+import { emailHelper } from '../helpers/emailHelper'
+import { emailTemplate } from '../shared/emailTemplate'
 
 export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
   try {
-    // Retrieve subscription details from Stripe
-    const subscription = await stripe.subscriptions.retrieve(
-      data.id as string,
-      {
-        expand: ['latest_invoice.payment_intent'],
-      },
-    )
-    const customer = (await stripe.customers.retrieve(
+    // 🔹 Step 1: Retrieve the full subscription with expanded data
+    const subscriptionResponse = await stripe.subscriptions.retrieve(data.id, {
+      expand: ['latest_invoice.payment_intent'],
+    })
+
+    const subscription =
+      subscriptionResponse as unknown as Stripe.Subscription & {
+        current_period_start: number
+        current_period_end: number
+      }
+
+    // 🔹 Step 2: Retrieve customer
+    const customerResponse = await stripe.customers.retrieve(
       subscription.customer as string,
-    )) as Stripe.Customer
+    )
+    const customer = customerResponse as Stripe.Customer
 
+    // 🔹 Step 3: Extract necessary info
     const productId = subscription.items.data[0]?.price?.product as string
+    // Use a custom type that includes payment_intent
+    const invoice = subscription.latest_invoice as Stripe.Invoice & {
+      payment_intent?: string | Stripe.PaymentIntent
+    }
 
-    const invoice = subscription.latest_invoice as Stripe.Invoice
+    const invoicePdf = invoice?.invoice_pdf
 
-    const invoicePdf = invoice.hosted_invoice_url // Direct link to PDF
-
-    const trxId = (invoice as any)?.payment_intent as string
+    // Get transaction ID from invoice or generate one
+    let trxId = null
+    if (invoice?.payment_intent) {
+      const paymentIntent =
+        typeof invoice.payment_intent === 'string'
+          ? await stripe.paymentIntents.retrieve(invoice.payment_intent)
+          : invoice.payment_intent
+      trxId = paymentIntent?.id
+    } else if (invoice?.id) {
+      trxId = invoice.id // Use invoice ID as fallback
+    } else {
+      trxId = `sub_${subscription.id}_${Date.now()}` // Generate a fallback ID
+    }
 
     const amountPaid = (invoice?.total || 0) / 100
 
-    // Find user and pricing plan
-    const user = (await User.findOne({ email: customer.email })) as any
+    // 🔹 Step 4: Match user by email
+    const user = await User.findOne({ email: customer.email })
+    if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
 
-    if (!user) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Invalid User!')
-    }
+    // 🔹 Step 5: Match plan by Stripe productId
+    const plan = await Plan.findOne({ productId })
+    if (!plan) throw new ApiError(StatusCodes.NOT_FOUND, 'Plan not found')
 
-    const plan = (await Plan.findOne({ productId })) as any
+    // 🔹 Step 6: Period dates
+    const currentPeriodStart = subscription.current_period_start
+      ? new Date(subscription.current_period_start * 1000)
+      : new Date()
+    const currentPeriodEnd = subscription.current_period_end
+      ? new Date(subscription.current_period_end * 1000)
+      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // Default to 30 days if missing
 
-    if (!plan) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Invalid Plan!')
-    }
-    const currentPeriodStart = subscription.start_date
-      ? new Date(subscription.start_date * 1000)
-      : null
-
-    // calcualte currentPeriodEnd
-    let currentPeriodEnd = null
-
-    if (subscription.start_date && plan.duration) {
-      const start = new Date(subscription.start_date * 1000)
-
-      const [durationValue, durationUnit] = plan.duration.split(' ')
-
-      const count = parseInt(durationValue)
-
-      switch (durationUnit) {
-        case 'month':
-        case 'months':
-          start.setMonth(start.getMonth() + count)
-          break
-
-        case 'year':
-        case 'years':
-          start.setFullYear(start.getFullYear() + count)
-          break
-
-        default:
-          console.warn('Unknown plan duration:', plan.duration)
-          break
-      }
-
-      currentPeriodEnd = start
-    }
-
-    const payload = {
+    // 🔹 Step 7: Save subscription info in DB
+    const subscriptionData = {
       customerId: customer.id,
       price: amountPaid,
       user: user._id,
@@ -93,13 +81,20 @@ export const handleSubscriptionCreated = async (data: Stripe.Subscription) => {
       currentPeriodStart,
       currentPeriodEnd,
     }
+    console.log('subscriptionData', subscriptionData)
+    await Subscription.create(subscriptionData)
 
-    await createNewSubscription(payload)
+    // 🔹 Step 8: Update user subscription status
+    await User.findByIdAndUpdate(user._id, { subscribe: true })
 
-    await User.findByIdAndUpdate(
-      { _id: user._id },
-      { subscribe: true },
-      { new: true },
+    await emailHelper.sendEmail(
+      emailTemplate.subscriptionActivatedEmail({
+        user,
+        plan,
+        amountPaid,
+        trxId,
+        invoicePdf: invoicePdf || '',
+      }),
     )
   } catch (error) {
     console.error('Error in handleSubscriptionCreated:', error)

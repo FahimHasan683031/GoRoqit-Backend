@@ -2,14 +2,11 @@ import colors from 'colors'
 import mongoose from 'mongoose'
 import { Server } from 'socket.io'
 import app from './app'
-import './cornJobs/subscriptionExpirationCron';
+import './cornJobs/subscriptionExpirationCron'
 import config from './config'
 import { errorLogger, logger } from './shared/logger'
 import { socketHelper } from './helpers/socketHelper'
 import { UserServices } from './app/modules/user/user.service'
-
-
-
 
 process.on('uncaughtException', error => {
   errorLogger.error('UnhandledException Detected', error)
@@ -26,13 +23,17 @@ async function main() {
     const port =
       typeof config.port === 'number' ? config.port : Number(config.port)
 
-    server = app.listen(port, config.ip_address as string, () => {
+    server = app.listen(port,() => {
       logger.info(
         colors.yellow(`♻️  Application listening on port:${config.port}`),
       )
-
     })
-       
+
+    // server = app.listen(port, config.ip_address as string, () => {
+    //   logger.info(
+    //     colors.yellow(`♻️  Application listening on port:${config.port}`),
+    //   )
+    // })
     //socket
     const io = new Server(server, {
       pingTimeout: 60000,

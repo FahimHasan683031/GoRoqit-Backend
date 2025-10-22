@@ -8,6 +8,7 @@ import QueryBuilder from '../../builder/QueryBuilder'
 import { Job } from '../job/job.model'
 import { USER_ROLES } from '../user/user.interface'
 import { User } from '../user/user.model'
+import { Notification } from '../notifications/notifications.model'
 
 export const createApplication = async (
   user: JwtPayload,
@@ -22,7 +23,10 @@ export const createApplication = async (
       throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found!')
     }
     if (!isExistUser.profileCompletion || isExistUser.profileCompletion < 50) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Please complete your profile first!')
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Please complete your profile first!',
+      )
     }
 
     const job = await Job.findById(payload.job)
@@ -74,6 +78,16 @@ export const createApplication = async (
         'Failed to update job application count',
       )
     }
+
+    await Notification.create(
+      {
+        to: job.user,
+        from: user.authId,
+        title: 'New Application Received',
+        body: `A new application has been received for your job: ${job.title}`,
+      },
+      { session },
+    )
 
     await session.commitTransaction()
 

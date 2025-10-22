@@ -26,7 +26,6 @@ const createPlanToDB = async (payload: IPlan): Promise<IPlan | null> => {
   }
 
   if (product) {
-    payload.paymentLink = product.paymentLink
     payload.productId = product.productId
     payload.priceId = product.priceId
   }
@@ -89,12 +88,7 @@ const updatePlanToDB = async (
 
     payload.priceId = price.id
 
-    // Optional: generate a new Payment Link
-    const paymentLink = await stripe.paymentLinks.create({
-      line_items: [{ price: price.id, quantity: 1 }],
-    })
 
-    payload.paymentLink = paymentLink.url
   }
 
   // 4. Update MongoDB

@@ -9,6 +9,7 @@ export type IEducation = {
   duration?: string;
   yearOfPassing?: number;
   cgpa?: number;
+  certificate?: string;
 };
 
 export type IWorkExperience = {

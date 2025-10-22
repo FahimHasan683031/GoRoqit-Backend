@@ -7,7 +7,7 @@ export type IPlan = {
     duration: '1 month' | '3 months' | '6 months' | '1 year'; 
     paymentType: 'Monthly' | 'Yearly';
     productId?: string;
-    paymentLink?: string;
+    // paymentLink?: string;
     status: 'Active' | 'Delete';
     priceId?: string;
     features: string[];
