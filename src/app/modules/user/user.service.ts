@@ -13,6 +13,7 @@ import { ApplicantProfile } from '../applicantProfile/applicantProfile.model'
 import { RecruiterProfile } from '../recruiterProfile/recruiterProfile.model'
 import QueryBuilder from '../../builder/QueryBuilder'
 import config from '../../../config'
+import { PortfolioData } from '../applicantProfile/applicantProfile.interface'
 
 
 const createAdmin = async (): Promise<Partial<IUser> | null> => {
@@ -211,6 +212,24 @@ export const updateProfile = async (
   }
 }
 
+const addApplicantPortfolio = async (user: JwtPayload, portfolioData: PortfolioData) => {
+  const profile = await ApplicantProfile.findOne({ userId: user.authId })
+  if (!profile) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Applicant profile not found')
+  }
+  profile.portfolio?.push(portfolioData)
+  return await profile.save()
+}
+
+const removeApplicantPortfolio = async (user: JwtPayload, title: string) => {
+  const profile = await ApplicantProfile.findOne({ userId: user.authId })
+  if (!profile) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Applicant profile not found')
+  }
+  profile.portfolio = profile.portfolio?.filter((item) => item.title !== title)
+  return await profile.save()
+}
+
 const getProfile = async (user: JwtPayload) => {
   const isExistUser = await User.findById(user.authId)
     .populate('profile')
@@ -295,5 +314,7 @@ export const UserServices = {
   getProfile,
   getApplicants,
   getCurrentUser,
-  deleteMyAccount
+  deleteMyAccount,
+  addApplicantPortfolio,
+  removeApplicantPortfolio
 }

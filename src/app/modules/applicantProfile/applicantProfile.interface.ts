@@ -12,6 +12,7 @@ export type IEducation = {
   certificate?: string;
 };
 
+
 export type IWorkExperience = {
   jobTitle: string;
   companyName: string;
@@ -22,6 +23,12 @@ export type IWorkExperience = {
   experience?: string;
 };
 
+export type PortfolioData = {
+  title: string;
+  description: string;
+  images: string[];
+};
+
 export type IApplicantProfile = {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
@@ -30,6 +37,7 @@ export type IApplicantProfile = {
   skills?: string[];
   education?: IEducation[];
   workExperience?: IWorkExperience[];
+  portfolio?: PortfolioData[];
   preferredWorkType?: "Full-time" | "Part-time" | "Contract" | "Internship" | "Other";
   languages?: string[];
   salaryExpectation?: string;

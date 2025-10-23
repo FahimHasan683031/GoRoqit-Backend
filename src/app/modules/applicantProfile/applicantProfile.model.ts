@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { IApplicantProfile, IEducation, IWorkExperience } from "./applicantProfile.interface";
+import { IApplicantProfile, IEducation, IWorkExperience, PortfolioData } from "./applicantProfile.interface";
 import { User } from "../user/user.model";
 import { calculateCompletion } from "../../../helpers/calculateProfileCompleation";
 
@@ -34,6 +34,17 @@ const WorkExperienceSchema = new Schema<IWorkExperience>(
   { _id: false }
 );
 
+const PortfolioSchema = new Schema<PortfolioData>(
+  {
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    images: { type: [String], default: [] },
+  },
+  { _id: false }
+);
+
+
+
 const ApplicantProfileSchema = new Schema<IApplicantProfile>(
   {
     userId: { 
@@ -55,6 +66,7 @@ const ApplicantProfileSchema = new Schema<IApplicantProfile>(
     salaryExpectation: { type: String, default: null },
     expartes: { type: [String], default: [] },
     openToWork: { type: Boolean, default: false },
+    portfolio: { type: [PortfolioSchema], default: [] },
     firstName: { type: String, required: true, trim: true, default: null },
     lastName: { type: String, trim: true, default: null },
     middleName: { type: String, trim: true, default: null },

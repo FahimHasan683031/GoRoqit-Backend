@@ -36,6 +36,6 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
     },
   });
 
-  // res.status(StatusCodes.OK).json({ url: session.url });
-  res.redirect(session.url as string)
+  res.status(StatusCodes.OK).json({ url: session.url });
+  // res.redirect(session.url as string)
 };
