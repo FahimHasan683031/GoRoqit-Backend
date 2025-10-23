@@ -152,5 +152,7 @@ export const UserController = {
   getProfile,
   getApplicants,
   getCurrentUser,
-  deleteMyAccount
+  deleteMyAccount,
+  addApplicantPortfolio,
+  removeApplicantPortfolio
 }

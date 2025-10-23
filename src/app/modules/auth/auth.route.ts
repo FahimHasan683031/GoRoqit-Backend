@@ -78,11 +78,7 @@ router.post(
 
 router.post(
   '/resend-otp',
-  // tempAuth(
-  //   USER_ROLES.ADMIN,
-  //   USER_ROLES.APPLICANT,
-  //   USER_ROLES.RECRUITER,
-  // ),
+ 
   validateRequest(AuthValidations.resendOtpZodSchema),
   CustomAuthController.resendOtp,
 )

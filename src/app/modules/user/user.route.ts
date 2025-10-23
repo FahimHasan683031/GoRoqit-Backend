@@ -33,6 +33,19 @@ router.delete(
   auth(USER_ROLES.APPLICANT, USER_ROLES.RECRUITER, USER_ROLES.ADMIN),
   UserController.deleteMyAccount,
 )
+// add applicant portfolio
+router.post(
+  '/applicants/portfolio',
+  auth(USER_ROLES.APPLICANT),
+  fileAndBodyProcessorUsingDiskStorage(),
+  UserController.addApplicantPortfolio,
+)
+// remove applicant portfolio
+router.delete(
+  '/applicants/portfolio',
+  auth(USER_ROLES.APPLICANT),
+  UserController.removeApplicantPortfolio,
+)
 
 // get single user
 router.get('/:id', UserController.getSingleUser)

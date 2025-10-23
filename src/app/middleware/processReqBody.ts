@@ -269,6 +269,7 @@ export const fileAndBodyProcessorUsingDiskStorage = () => {
             companyLogo: processedFiles.companyLogo,
             resume: processedFiles.resume,
             image: processedFiles.image,
+            portfolio: processedFiles.portfolio,
           }
         }
 
