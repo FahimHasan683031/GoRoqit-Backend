@@ -98,7 +98,7 @@ const addApplicantPortfolio = catchAsync(async (req: Request, res: Response) => 
 
 // remove applicant portfolio
 const removeApplicantPortfolio = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserServices.removeApplicantPortfolio(req.user! as JwtPayload, req.query.title as string)
+  const result = await UserServices.removeApplicantPortfolio(req.user! as JwtPayload, req.params.title)
   sendResponse<IApplicantProfile>(res, {
     statusCode: StatusCodes.OK,
     success: true,

@@ -42,7 +42,7 @@ router.post(
 )
 // remove applicant portfolio
 router.delete(
-  '/applicants/portfolio',
+  '/applicants/portfolio/:title',
   auth(USER_ROLES.APPLICANT),
   UserController.removeApplicantPortfolio,
 )
