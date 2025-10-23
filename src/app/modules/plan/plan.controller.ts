@@ -63,9 +63,9 @@ const deletePlan = catchAsync(async(req: Request, res: Response)=>{
 const createCheckoutSession = catchAsync(async(req: Request, res: Response)=>{
     const result = await PackageService.creatSession(req.user!, req.params.planId as string);
 
-    // res.status(StatusCodes.OK).json({ url: result.url })
+    res.status(StatusCodes.OK).json({ url: result.url })
 
-    res.redirect(result.url as string)
+    // res.redirect(result.url as string)
 })
 
 
