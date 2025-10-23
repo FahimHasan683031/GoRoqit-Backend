@@ -4,7 +4,6 @@ import { createPlanZodValidationSchema, updatePlanZodValidationSchema } from "./
 import auth from "../../middleware/auth";
 import { USER_ROLES } from "../user/user.interface";
 import validateRequest from "../../middleware/validateRequest";
-import { createCheckoutSession } from "../../../stripe/createCheckoutSession";
 const router = express.Router()
 
 router.route("/")
