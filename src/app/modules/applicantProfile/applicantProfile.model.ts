@@ -38,7 +38,7 @@ const PortfolioSchema = new Schema<PortfolioData>(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
-    images: { type: [String], default: [] },
+    portfolioImages: { type: [String], default: [] },
   },
   { _id: false }
 );

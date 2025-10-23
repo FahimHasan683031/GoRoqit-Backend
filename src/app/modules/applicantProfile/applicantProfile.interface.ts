@@ -26,7 +26,7 @@ export type IWorkExperience = {
 export type PortfolioData = {
   title: string;
   description: string;
-  images: string[];
+  portfolioImages: string[];
 };
 
 export type IApplicantProfile = {
