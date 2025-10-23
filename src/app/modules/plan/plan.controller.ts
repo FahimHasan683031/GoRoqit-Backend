@@ -60,6 +60,10 @@ const deletePlan = catchAsync(async(req: Request, res: Response)=>{
     })
 })
 
+const createCheckoutSession = catchAsync(async(req: Request, res: Response)=>{
+    const result = await PackageService.creatSession(req.user!, req.query.planId as string);
+    res.redirect(result.url as string)
+})
 
 
 export const PlanController = {
@@ -67,5 +71,6 @@ export const PlanController = {
     updatePlan,
     getPlan,
     planDetails,
-    deletePlan
+    deletePlan,
+    createCheckoutSession
 }

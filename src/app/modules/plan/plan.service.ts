@@ -7,6 +7,8 @@ import { createStripeProductCatalog } from '../../../stripe/createStripeProductC
 import ApiError from '../../../errors/ApiError'
 import { deleteStripeProductCatalog } from '../../../stripe/deleteStripeProductCatalog'
 import { Subscription } from '../subscription/subscription.model'
+import { JwtPayload } from 'jsonwebtoken'
+import { createCheckoutSession } from '../../../stripe/createCheckoutSession'
 // Create plan in DB and Stripe Product
 const createPlanToDB = async (payload: IPlan): Promise<IPlan | null> => {
   const productPayload = {
@@ -38,6 +40,16 @@ const createPlanToDB = async (payload: IPlan): Promise<IPlan | null> => {
 
   return result
 }
+
+
+const creatSession = async ( user:JwtPayload,planId:string,) => {
+const url = await createCheckoutSession(user,planId)
+
+  return { url }
+}
+
+
+
 // Update plan in DB and Stripe Product
 const updatePlanToDB = async (
   id: string,
@@ -176,4 +188,6 @@ export const PackageService = {
   getPlanFromDB,
   getPlanDetailsFromDB,
   deletePlanToDB,
+  creatSession,
 }
+

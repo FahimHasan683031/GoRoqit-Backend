@@ -2,21 +2,24 @@ import { Request, Response } from "express";
 import stripe from "../config/stripe";
 import { User } from "../app/modules/user/user.model";
 import { Plan } from "../app/modules/plan/plan.model";
-import ApiError from "../errors/ApiError";
 import { StatusCodes } from "http-status-codes";
 import config from "../config";
 import { JwtPayload } from "jsonwebtoken";
+import ApiError from "../errors/ApiError";
 
 
-export const createCheckoutSession = async (req: Request, res: Response) => {
-  const { authId: userId } = req.user as JwtPayload;
-  const { planId } = req.body;
+export const createCheckoutSession = async (userdata:JwtPayload,planId:string) => {
+  const { authId: userId } = userdata;
+  console.log(userId,planId)
+
 
   const user = await User.findById(userId);
   if (!user) throw new ApiError(StatusCodes.NOT_FOUND, "User not found");
 
   const plan = await Plan.findById(planId);
-  if (!plan) throw new ApiError(StatusCodes.NOT_FOUND, "Plan not found");
+  if(!plan){
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Plan not found!')
+  }
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
@@ -35,7 +38,5 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       userId: user._id.toString(),
     },
   });
-
-  res.status(StatusCodes.OK).json({ url: session.url });
-  // res.redirect(session.url as string)
+ return session.url
 };
