@@ -65,7 +65,6 @@ const createCheckoutSession = catchAsync(async(req: Request, res: Response)=>{
 
     res.status(StatusCodes.OK).json({ url: result.url })
 
-    // res.redirect(result.url as string)
 })
 
 
