@@ -15,7 +15,6 @@ import QueryBuilder from '../../builder/QueryBuilder'
 import config from '../../../config'
 import { PortfolioData } from '../applicantProfile/applicantProfile.interface'
 
-
 const createAdmin = async (): Promise<Partial<IUser> | null> => {
   const admin = {
     email: config.super_admin.email,
@@ -51,39 +50,32 @@ const createAdmin = async (): Promise<Partial<IUser> | null> => {
 }
 
 const getAllUser = async (query: Record<string, unknown>) => {
-  const userQueryBuilder = new QueryBuilder(
-    User.find(),
-    query
-  )
+  const userQueryBuilder = new QueryBuilder(User.find(), query)
     .filter()
     .sort()
     .fields()
     .paginate()
 
-  const users = await userQueryBuilder.modelQuery.lean();
-  const paginationInfo = await userQueryBuilder.getPaginationInfo();
+  const users = await userQueryBuilder.modelQuery.lean()
+  const paginationInfo = await userQueryBuilder.getPaginationInfo()
 
+  const totalUsers = await User.countDocuments()
 
-    const totalUsers = await User.countDocuments();
-
-    const totalRecruiters = await User.countDocuments({
+  const totalRecruiters = await User.countDocuments({
     role: USER_ROLES.RECRUITER,
-  });
+  })
 
   const totalApplicants = await User.countDocuments({
     role: USER_ROLES.APPLICANT,
-  });
+  })
 
-  const staticData = {totalUsers,
-    totalRecruiters,
-    totalApplicants,
-  }
+  const staticData = { totalUsers, totalRecruiters, totalApplicants }
 
   return {
-     users,staticData,
+    users,
+    staticData,
     meta: paginationInfo,
-  };
-
+  }
 }
 
 const getSingleUser = async (id: string) => {
@@ -146,9 +138,9 @@ const deleteUser = async (id: string) => {
     throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
   }
   const result = await User.findByIdAndDelete(id)
-  if(user.role === USER_ROLES.APPLICANT) {
+  if (user.role === USER_ROLES.APPLICANT) {
     await ApplicantProfile.findByIdAndDelete(user.profile)
-  } else if(user.role === USER_ROLES.RECRUITER) {
+  } else if (user.role === USER_ROLES.RECRUITER) {
     await RecruiterProfile.findByIdAndDelete(user.profile)
   }
   return result
@@ -158,7 +150,6 @@ export const updateProfile = async (
   user: JwtPayload,
   payload: IUpdateProfilePayload,
 ) => {
-  
   const isExistUser = await User.findById(user.authId)
 
   if (!isExistUser) {
@@ -192,6 +183,12 @@ export const updateProfile = async (
 
   // 2. Update role-based profile
   if (isExistUser.role === USER_ROLES.APPLICANT && isExistUser.profile) {
+    if (payload.openToWork && isExistUser.profileCompletion! < 60) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Please complete your profile first!',
+      )
+    }
     const res = await ApplicantProfile.findByIdAndUpdate(
       isExistUser.profile,
       payload,
@@ -212,7 +209,10 @@ export const updateProfile = async (
   }
 }
 
-const addApplicantPortfolio = async (user: JwtPayload, portfolioData: PortfolioData) => {
+const addApplicantPortfolio = async (
+  user: JwtPayload,
+  portfolioData: PortfolioData,
+) => {
   const profile = await ApplicantProfile.findOne({ userId: user.authId })
   if (!profile) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Applicant profile not found')
@@ -226,7 +226,7 @@ const removeApplicantPortfolio = async (user: JwtPayload, title: string) => {
   if (!profile) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Applicant profile not found')
   }
-  profile.portfolio = profile.portfolio?.filter((item) => item.title !== title)
+  profile.portfolio = profile.portfolio?.filter(item => item.title !== title)
   return await profile.save()
 }
 
@@ -257,24 +257,31 @@ const getCurrentUser = async (user: JwtPayload) => {
 const getApplicants = async (query: Record<string, unknown>) => {
   const applicantQueryBuilder = new QueryBuilder(
     ApplicantProfile.find({ openToWork: true }),
-    query
+    query,
   )
-    .search(["firstName", "lastName", "preferredName", "skills", "city", "country"]) 
+    .search([
+      'firstName',
+      'lastName',
+      'preferredName',
+      'skills',
+      'city',
+      'country',
+    ])
     .filter()
     .sort()
     .fields()
     .paginate()
-    .populate(["userId"], {
-      userId: "email name role image status verified", 
-    });
+    .populate(['userId'], {
+      userId: 'email name role image status verified',
+    })
 
-  const applicants = await applicantQueryBuilder.modelQuery.lean();
-  const paginationInfo = await applicantQueryBuilder.getPaginationInfo();
+  const applicants = await applicantQueryBuilder.modelQuery.lean()
+  const paginationInfo = await applicantQueryBuilder.getPaginationInfo()
 
   return {
     data: applicants,
     meta: paginationInfo,
-  };
+  }
 }
 
 const deleteMyAccount = async (user: JwtPayload) => {
@@ -286,23 +293,18 @@ const deleteMyAccount = async (user: JwtPayload) => {
     )
   }
   if (isExistUser.role === USER_ROLES.APPLICANT && isExistUser.profile) {
-   const res= await ApplicantProfile.findByIdAndDelete(isExistUser.profile)
-   if(res) {
-    await User.findByIdAndDelete(isExistUser._id)
-   }
-   
-
+    const res = await ApplicantProfile.findByIdAndDelete(isExistUser.profile)
+    if (res) {
+      await User.findByIdAndDelete(isExistUser._id)
+    }
   } else if (isExistUser.role === USER_ROLES.RECRUITER && isExistUser.profile) {
-    const res= await RecruiterProfile.findByIdAndDelete(isExistUser.profile)
-    if(res) {
+    const res = await RecruiterProfile.findByIdAndDelete(isExistUser.profile)
+    if (res) {
       await User.findByIdAndDelete(isExistUser._id)
     }
   }
   return 'Account deleted successfully'
 }
-
-
-
 
 export const UserServices = {
   updateProfile,
@@ -316,5 +318,5 @@ export const UserServices = {
   getCurrentUser,
   deleteMyAccount,
   addApplicantPortfolio,
-  removeApplicantPortfolio
+  removeApplicantPortfolio,
 }

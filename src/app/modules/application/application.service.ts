@@ -22,7 +22,7 @@ export const createApplication = async (
     if (!isExistUser) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found!')
     }
-    if (!isExistUser.profileCompletion || isExistUser.profileCompletion < 50) {
+    if (!isExistUser.profileCompletion || isExistUser.profileCompletion < 60) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
         'Please complete your profile first!',

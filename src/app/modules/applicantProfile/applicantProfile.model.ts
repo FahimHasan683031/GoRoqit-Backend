@@ -94,9 +94,9 @@ const ApplicantProfileSchema = new Schema<IApplicantProfile>(
 
 ApplicantProfileSchema.pre("save", async function (next) {
   const fields = [
-    "resume", "skills", "education", "workExperience", "preferredWorkType",
-    "languages", "salaryExpectation", "expartes", "openToWork", "firstName",
-    "lastName", "preferredName", "gender", "maritalStatus", "citizenship",
+    "resume", "skills", "preferredWorkType",
+    "languages", "salaryExpectation", "expartes",  "firstName",
+    "lastName",  "gender", "maritalStatus", "citizenship",
     "dateOfBirth", "streetAddress", "country", "city", "zipCode", "mobile", "bio"
   ];
 
@@ -110,9 +110,9 @@ ApplicantProfileSchema.post('findOneAndUpdate', async function (doc) {
   if (!doc) return;
   
   const fields = [
-    "resume", "skills", "education", "workExperience", "preferredWorkType",
-    "languages", "salaryExpectation", "expartes", "openToWork", "firstName",
-    "lastName", "preferredName", "gender", "maritalStatus", "citizenship",
+    "resume", "skills",  "preferredWorkType",
+    "languages", "salaryExpectation", "expartes", "firstName",
+    "lastName",  "gender", "maritalStatus", "citizenship",
     "dateOfBirth", "streetAddress", "country", "city", "zipCode", "mobile", "bio"
   ];
 
