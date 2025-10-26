@@ -173,13 +173,50 @@ export const fileAndBodyProcessorUsingDiskStorage = () => {
   ) => {
     try {
       const allowedTypes = {
-        image: ['image/jpeg', 'image/png', 'image/jpg'],
+        image: [
+          'image/jpeg',
+          'image/png',
+          'image/gif',
+          'image/bmp',
+          'image/webp',
+          'image/tiff',
+          'image/svg+xml',
+          'image/heic', // iOS format
+          'image/heif', // iOS format
+          'image/avif',
+          'image/x-icon',
+        ],
         media: ['video/mp4', 'audio/mpeg'],
         documents: ['application/pdf'],
         resume: ['application/pdf'],
-        companyLogo: ['image/jpeg', 'image/png', 'image/jpg'],
+        companyLogo: [
+          'image/jpeg',
+          'image/png',
+          'image/gif',
+          'image/bmp',
+          'image/webp',
+          'image/tiff',
+          'image/svg+xml',
+          'image/heic', // iOS format
+          'image/heif', // iOS format
+          'image/avif',
+          'image/x-icon',
+        ],
         certificate: ['application/pdf', 'image/jpeg', 'image/png'], // ✅ allowed
-        portfolio: ['image/jpeg', 'image/png', 'application/pdf'], // ✅ allowed
+        portfolio: [
+          'image/jpeg',
+          'image/png',
+          'image/gif',
+          'image/bmp',
+          'image/webp',
+          'image/tiff',
+          'image/svg+xml',
+          'image/heic', // iOS format
+          'image/heif', // iOS format
+          'image/avif',
+          'image/x-icon',
+        ],
+        // ✅ allowed
       }
 
       const fieldType = file.fieldname as IFolderName
@@ -279,47 +316,6 @@ export const fileAndBodyProcessorUsingDiskStorage = () => {
     })
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import { Request, Response, NextFunction } from 'express'
 // import multer, { FileFilterCallback } from 'multer'
@@ -513,31 +509,3 @@ export const fileAndBodyProcessorUsingDiskStorage = () => {
 //     })
 //   }
 // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
