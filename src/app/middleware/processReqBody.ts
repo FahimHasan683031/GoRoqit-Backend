@@ -141,30 +141,30 @@ export const fileAndBodyProcessor = () => {
   }
 }
 
-// ========== DISK STORAGE ==============
+// ========== DISK STORAGE (PARALLEL + FAST) ==============
 export const fileAndBodyProcessorUsingDiskStorage = () => {
-  const uploadsDir = path.join(process.cwd(), 'uploads')
+  const uploadsDir = path.join(process.cwd(), 'uploads');
   if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true })
+    fs.mkdirSync(uploadsDir, { recursive: true });
   }
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      const folderPath = path.join(uploadsDir, file.fieldname)
+      const folderPath = path.join(uploadsDir, file.fieldname);
       if (!fs.existsSync(folderPath)) {
-        fs.mkdirSync(folderPath, { recursive: true })
+        fs.mkdirSync(folderPath, { recursive: true });
       }
-      cb(null, folderPath)
+      cb(null, folderPath);
     },
     filename: (req, file, cb) => {
       const extension =
-        path.extname(file.originalname) || `.${file.mimetype.split('/')[1]}`
+        path.extname(file.originalname) || `.${file.mimetype.split('/')[1]}`;
       const filename = `${Date.now()}-${Math.random()
         .toString(36)
-        .slice(2, 8)}${extension}`
-      cb(null, filename)
+        .slice(2, 8)}${extension}`;
+      cb(null, filename);
     },
-  })
+  });
 
   const fileFilter = (
     req: Request,
@@ -178,105 +178,263 @@ export const fileAndBodyProcessorUsingDiskStorage = () => {
         documents: ['application/pdf'],
         resume: ['application/pdf'],
         companyLogo: ['image/jpeg', 'image/png', 'image/jpg'],
-        certificate: ['application/pdf', 'image/jpeg', 'image/png'], // ✅ allowed
-        portfolio: ['image/jpeg', 'image/png', 'application/pdf'], // ✅ allowed
-      }
+        certificate: ['application/pdf', 'image/jpeg', 'image/png'],
+        portfolio: ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'],
+      };
 
-      const fieldType = file.fieldname as IFolderName
+      const fieldType = file.fieldname as IFolderName;
       if (!allowedTypes[fieldType]?.includes(file.mimetype)) {
         return cb(
           new ApiError(
             StatusCodes.BAD_REQUEST,
             `Invalid file type for ${file.fieldname}`,
           ),
-        )
+        );
       }
-      cb(null, true)
+      cb(null, true);
     } catch (error) {
       cb(
         new ApiError(
           StatusCodes.INTERNAL_SERVER_ERROR,
           'File validation failed',
         ),
-      )
+      );
     }
-  }
+  };
 
   const upload = multer({
     storage,
     fileFilter,
     limits: { fileSize: 10 * 1024 * 1024, files: 50 },
-  }).fields(uploadFields)
+  }).fields(uploadFields);
 
   return (req: Request, res: Response, next: NextFunction) => {
-    upload(req, res, async error => {
-      if (error) return next(error)
+    upload(req, res, async (error) => {
+      if (error) return next(error);
 
       try {
+        // Parse JSON wrapper
         if (req.body?.data) {
-          req.body = JSON.parse(req.body.data)
+          req.body = JSON.parse(req.body.data);
         }
 
-        if (req.files) {
-          const processedFiles: ProcessedFiles = {}
-          const fieldsConfig = new Map(
-            uploadFields.map(f => [f.name, f.maxCount]),
-          )
+        if (!req.files) {
+          return next();
+        }
 
-          for (const [fieldName, files] of Object.entries(req.files)) {
-            const maxCount = fieldsConfig.get(fieldName as IFolderName) ?? 1
-            const fileArray = files as Express.Multer.File[]
-            const paths: string[] = []
+        const processedFiles: ProcessedFiles = {};
+        const fieldsConfig = new Map(
+          uploadFields.map((f) => [f.name, f.maxCount]),
+        );
 
-            for (const file of fileArray) {
-              const filePath = `/${fieldName}/${file.filename}`
+        // Process ALL fields in parallel
+        await Promise.all(
+          Object.entries(req.files).map(async ([fieldName, files]) => {
+            const fileArray = files as Express.Multer.File[];
+            const maxCount = fieldsConfig.get(fieldName as IFolderName) ?? 1;
+            const paths: string[] = [];
 
-              // Optimize image files
-              if (
-                ['image', 'portfolio', 'companyLogo', 'certificate'].includes(
-                  fieldName,
-                ) &&
-                file.mimetype.startsWith('image/')
-              ) {
-                try {
-                  const fullPath = path.join(
-                    uploadsDir,
+            // Optimize ALL images in this field in parallel
+            await Promise.all(
+              fileArray.map(async (file) => {
+                const filePath = `/${fieldName}/${file.filename}`;
+                paths.push(filePath);
+
+                // Only optimize images
+                if (
+                  ['image', 'portfolio', 'companyLogo', 'certificate'].includes(
                     fieldName,
-                    file.filename,
-                  )
-                  let sharpInstance = sharp(fullPath).resize(800)
-                  if (file.mimetype === 'image/png') {
-                    sharpInstance = sharpInstance.png({ quality: 80 })
-                  } else {
-                    sharpInstance = sharpInstance.jpeg({ quality: 80 })
+                  ) &&
+                  file.mimetype.startsWith('image/')
+                ) {
+                  const fullPath = path.join(uploadsDir, fieldName, file.filename);
+                  const tempPath = fullPath + '.opt';
+
+                  try {
+                    let sharpInstance = sharp(fullPath)
+                      .rotate() // fix orientation
+                      .resize(800, null, { withoutEnlargement: true });
+
+                    if (file.mimetype === 'image/png') {
+                      sharpInstance = sharpInstance.png({ quality: 80 });
+                    } else {
+                      sharpInstance = sharpInstance.jpeg({
+                        quality: 80,
+                        mozjpeg: true,
+                      });
+                    }
+
+                    await sharpInstance.toFile(tempPath);
+                    fs.unlinkSync(fullPath);
+                    fs.renameSync(tempPath, fullPath);
+                  } catch (err) {
+                    console.error(`Failed to optimize ${filePath}:`, err);
+                    // Don't fail upload if optimization fails
                   }
-                  await sharpInstance.toFile(fullPath + '.optimized')
-                  fs.unlinkSync(fullPath)
-                  fs.renameSync(fullPath + '.optimized', fullPath)
-                } catch (err) {
-                  console.error('Image optimization failed:', err)
                 }
-              }
+              }),
+            );
 
-              paths.push(filePath)
-            }
+            processedFiles[fieldName] = maxCount > 1 ? paths : paths[0];
+          }),
+        );
 
-            processedFiles[fieldName] = maxCount > 1 ? paths : paths[0]
-          }
-          console.log(processedFiles)
-          req.body = {
-            ...req.body,
-            companyLogo: processedFiles.companyLogo,
-            resume: processedFiles.resume,
-            image: processedFiles.image,
-            portfolioImages: processedFiles.portfolio,
-          }
-        }
+        // Merge exactly as you had
+        req.body = {
+          ...req.body,
+          companyLogo: processedFiles.companyLogo,
+          resume: processedFiles.resume,
+          image: processedFiles.image,
+          portfolioImages: processedFiles.portfolio, // ← your custom key
+        };
 
-        next()
+        next();
       } catch (err) {
-        next(err)
+        next(err);
       }
-    })
-  }
-}
+    });
+  };
+};
+
+
+
+
+// // ========== DISK STORAGE ==============
+// export const fileAndBodyProcessorUsingDiskStorage = () => {
+//   const uploadsDir = path.join(process.cwd(), 'uploads')
+//   if (!fs.existsSync(uploadsDir)) {
+//     fs.mkdirSync(uploadsDir, { recursive: true })
+//   }
+
+//   const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//       const folderPath = path.join(uploadsDir, file.fieldname)
+//       if (!fs.existsSync(folderPath)) {
+//         fs.mkdirSync(folderPath, { recursive: true })
+//       }
+//       cb(null, folderPath)
+//     },
+//     filename: (req, file, cb) => {
+//       const extension =
+//         path.extname(file.originalname) || `.${file.mimetype.split('/')[1]}`
+//       const filename = `${Date.now()}-${Math.random()
+//         .toString(36)
+//         .slice(2, 8)}${extension}`
+//       cb(null, filename)
+//     },
+//   })
+
+//   const fileFilter = (
+//     req: Request,
+//     file: Express.Multer.File,
+//     cb: FileFilterCallback,
+//   ) => {
+//     try {
+//       const allowedTypes = {
+//         image: ['image/jpeg', 'image/png', 'image/jpg'],
+//         media: ['video/mp4', 'audio/mpeg'],
+//         documents: ['application/pdf'],
+//         resume: ['application/pdf'],
+//         companyLogo: ['image/jpeg', 'image/png', 'image/jpg'],
+//         certificate: ['application/pdf', 'image/jpeg', 'image/png'], // ✅ allowed
+//         portfolio: ['image/jpeg', 'image/png', 'application/pdf'], // ✅ allowed
+//       }
+
+//       const fieldType = file.fieldname as IFolderName
+//       if (!allowedTypes[fieldType]?.includes(file.mimetype)) {
+//         return cb(
+//           new ApiError(
+//             StatusCodes.BAD_REQUEST,
+//             `Invalid file type for ${file.fieldname}`,
+//           ),
+//         )
+//       }
+//       cb(null, true)
+//     } catch (error) {
+//       cb(
+//         new ApiError(
+//           StatusCodes.INTERNAL_SERVER_ERROR,
+//           'File validation failed',
+//         ),
+//       )
+//     }
+//   }
+
+//   const upload = multer({
+//     storage,
+//     fileFilter,
+//     limits: { fileSize: 10 * 1024 * 1024, files: 50 },
+//   }).fields(uploadFields)
+
+//   return (req: Request, res: Response, next: NextFunction) => {
+//     upload(req, res, async error => {
+//       if (error) return next(error)
+
+//       try {
+//         if (req.body?.data) {
+//           req.body = JSON.parse(req.body.data)
+//         }
+
+//         if (req.files) {
+//           const processedFiles: ProcessedFiles = {}
+//           const fieldsConfig = new Map(
+//             uploadFields.map(f => [f.name, f.maxCount]),
+//           )
+
+//           for (const [fieldName, files] of Object.entries(req.files)) {
+//             const maxCount = fieldsConfig.get(fieldName as IFolderName) ?? 1
+//             const fileArray = files as Express.Multer.File[]
+//             const paths: string[] = []
+
+//             for (const file of fileArray) {
+//               const filePath = `/${fieldName}/${file.filename}`
+
+//               // Optimize image files
+//               if (
+//                 ['image', 'portfolio', 'companyLogo', 'certificate'].includes(
+//                   fieldName,
+//                 ) &&
+//                 file.mimetype.startsWith('image/')
+//               ) {
+//                 try {
+//                   const fullPath = path.join(
+//                     uploadsDir,
+//                     fieldName,
+//                     file.filename,
+//                   )
+//                   let sharpInstance = sharp(fullPath).resize(800)
+//                   if (file.mimetype === 'image/png') {
+//                     sharpInstance = sharpInstance.png({ quality: 80 })
+//                   } else {
+//                     sharpInstance = sharpInstance.jpeg({ quality: 80 })
+//                   }
+//                   await sharpInstance.toFile(fullPath + '.optimized')
+//                   fs.unlinkSync(fullPath)
+//                   fs.renameSync(fullPath + '.optimized', fullPath)
+//                 } catch (err) {
+//                   console.error('Image optimization failed:', err)
+//                 }
+//               }
+
+//               paths.push(filePath)
+//             }
+
+//             processedFiles[fieldName] = maxCount > 1 ? paths : paths[0]
+//           }
+//           console.log(processedFiles)
+//           req.body = {
+//             ...req.body,
+//             companyLogo: processedFiles.companyLogo,
+//             resume: processedFiles.resume,
+//             image: processedFiles.image,
+//             portfolioImages: processedFiles.portfolio,
+//           }
+//         }
+
+//         next()
+//       } catch (err) {
+//         next(err)
+//       }
+//     })
+//   }
+// }
