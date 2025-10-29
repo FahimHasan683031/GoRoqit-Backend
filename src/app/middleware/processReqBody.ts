@@ -141,7 +141,7 @@ export const fileAndBodyProcessor = () => {
   }
 }
 
-// ========== DISK STORAGE (PARALLEL + FAST) ==============
+
 export const fileAndBodyProcessorUsingDiskStorage = () => {
   const uploadsDir = path.join(process.cwd(), 'uploads');
   if (!fs.existsSync(uploadsDir)) {
