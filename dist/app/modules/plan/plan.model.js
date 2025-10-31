@@ -29,10 +29,6 @@ const planSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
-    paymentLink: {
-        type: String,
-        required: true
-    },
     priceId: {
         type: String,
         required: true

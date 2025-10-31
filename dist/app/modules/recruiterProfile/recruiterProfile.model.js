@@ -35,6 +35,8 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RecruiterProfile = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const calculateProfileCompleation_1 = require("../../../helpers/calculateProfileCompleation");
+const user_model_1 = require("../user/user.model");
 const RecruiterProfileSchema = new mongoose_1.Schema({
     userId: {
         type: mongoose_1.Schema.Types.ObjectId,
@@ -55,5 +57,27 @@ const RecruiterProfileSchema = new mongoose_1.Schema({
     instagramProfile: { type: String, default: null },
     bio: { type: String, maxlength: 500 },
 }, { timestamps: true });
+RecruiterProfileSchema.pre("save", async function (next) {
+    const fields = [
+        "companyName", "companyWebsite", "companyDescription", "companyLogo",
+        "phone", "companyEmail", "location", "linkedinProfile", "twitterProfile",
+        "facebookProfile", "instagramProfile", "bio"
+    ];
+    const docObject = this.toObject ? this.toObject() : this;
+    this._completion = (0, calculateProfileCompleation_1.calculateCompletion)(docObject, fields);
+    next();
+});
+RecruiterProfileSchema.post('findOneAndUpdate', async function (doc) {
+    if (!doc)
+        return;
+    const fields = [
+        "companyName", "companyWebsite", "companyDescription", "companyLogo",
+        "phone", "companyEmail", "location", "linkedinProfile", "twitterProfile",
+        "facebookProfile", "instagramProfile", "bio"
+    ];
+    const docObject = doc.toObject ? doc.toObject() : doc;
+    const percentage = (0, calculateProfileCompleation_1.calculateCompletion)(docObject, fields);
+    await user_model_1.User.findByIdAndUpdate(doc.userId, { profileCompletion: percentage });
+});
 RecruiterProfileSchema.index({ companyName: 1 });
 exports.RecruiterProfile = mongoose_1.default.model("RecruiterProfile", RecruiterProfileSchema);

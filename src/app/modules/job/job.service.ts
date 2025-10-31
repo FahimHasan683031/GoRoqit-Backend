@@ -135,9 +135,23 @@ const updateJob = async (
   return result
 }
 
-const deleteJob = async (id: string): Promise<IJob> => {
+const deleteJob = async (user: JwtPayload, id: string): Promise<IJob> => {
   if (!Types.ObjectId.isValid(id)) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Job ID')
+  }
+  const isExistJob = await Job.findById(id)
+  if (!isExistJob) {
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      'Requested job not found, please try again with valid id',
+    )
+  }
+
+  if (user.role !== USER_ROLES.ADMIN && isExistJob.user.toString() !== user.authId) {
+    throw new ApiError(
+      StatusCodes.FORBIDDEN,
+      'You are not authorized to delete this job',
+    )
   }
 
   const result = await Job.findByIdAndDelete(id)

@@ -38,10 +38,10 @@ const forgetPasswordZodSchema = zod_1.z.object({
 });
 const resetPasswordZodSchema = zod_1.z.object({
     body: zod_1.z.object({
-        newPassword: zod_1.z.string().min(8, { message: 'Password is required' }),
+        newPassword: zod_1.z.string().min(6, { message: 'Password is required' }),
         confirmPassword: zod_1.z
             .string()
-            .min(8, { message: 'Confirm Password is required' }),
+            .min(6, { message: 'Confirm Password is required' }),
     }),
 });
 const loginZodSchema = zod_1.z.object({
@@ -59,7 +59,7 @@ const loginZodSchema = zod_1.z.object({
             message: 'Invalid phone number format',
         }),
         deviceToken: zod_1.z.string().min(1).optional(),
-        password: zod_1.z.string(),
+        password: zod_1.z.string({ message: 'Credentials are required' }).min(6, { message: 'Invalid Credentials' }),
     }),
 });
 const verifyAccountZodSchema = zod_1.z.object({

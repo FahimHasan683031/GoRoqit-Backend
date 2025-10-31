@@ -7,6 +7,11 @@ const subscriptionSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    user: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
     price: {
         type: Number,
         required: true
@@ -31,6 +36,10 @@ const subscriptionSchema = new mongoose_1.Schema({
     currentPeriodEnd: {
         type: Date,
         required: true
+    },
+    invoice: {
+        type: String,
+        required: false
     },
     status: {
         type: String,

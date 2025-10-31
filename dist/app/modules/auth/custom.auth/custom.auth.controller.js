@@ -42,7 +42,7 @@ const forgetPassword = (0, catchAsync_1.default)(async (req, res) => {
     });
 });
 const resetPassword = (0, catchAsync_1.default)(async (req, res) => {
-    const token = req.headers.authorization;
+    const token = req.query.token;
     const { ...resetData } = req.body;
     const result = await custom_auth_service_1.CustomAuthServices.resetPassword(token, resetData);
     (0, sendResponse_1.default)(res, {
@@ -66,7 +66,7 @@ const verifyAccount = (0, catchAsync_1.default)(async (req, res) => {
         statusCode: status,
         success: true,
         message: message,
-        data: { accessToken, role },
+        data: { accessToken, role, token },
     });
 });
 const getAccessToken = (0, catchAsync_1.default)(async (req, res) => {

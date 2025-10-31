@@ -10,6 +10,7 @@ dotenv_1.default.config({ path: path_1.default.join(process.cwd(), '.env') });
 exports.default = {
     ip_address: process.env.IP_ADDRESS,
     database_url: process.env.DATABASE_URL,
+    google_redirect_url: process.env.GOOGLE_REDIRECT_URL,
     node_env: process.env.NODE_ENV,
     port: process.env.PORT,
     bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
@@ -40,6 +41,7 @@ exports.default = {
         stripeSecretKey: process.env.STRIPE_API_SECRET,
         webhookSecret: process.env.WEBHOOK_SECRET,
         paymentSuccess: process.env.SUCCESS_URL,
+        frontendUrl: process.env.FRONTEND_URL,
     },
     email: {
         from: process.env.EMAIL_FROM,

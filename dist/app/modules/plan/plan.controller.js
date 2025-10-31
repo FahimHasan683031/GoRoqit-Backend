@@ -53,10 +53,15 @@ const deletePlan = (0, catchAsync_1.default)(async (req, res) => {
         data: result
     });
 });
+const createCheckoutSession = (0, catchAsync_1.default)(async (req, res) => {
+    const result = await plan_service_1.PackageService.creatSession(req.user, req.params.planId);
+    res.status(http_status_codes_1.StatusCodes.OK).json({ url: result.url });
+});
 exports.PlanController = {
     createPlan,
     updatePlan,
     getPlan,
     planDetails,
-    deletePlan
+    deletePlan,
+    createCheckoutSession
 };

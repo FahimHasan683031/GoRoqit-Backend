@@ -206,7 +206,7 @@ const resetPassword = async (resetToken, payload) => {
         .select('+authentication')
         .lean();
     if (!isUserExist) {
-        throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Something went wrong, please try again. or contact support.');
+        throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Requested user not found, please try again. or contact support.');
     }
     const { authentication } = isUserExist;
     if (!(authentication === null || authentication === void 0 ? void 0 : authentication.resetPassword)) {
@@ -383,7 +383,6 @@ const deleteAccount = async (user, password) => {
     };
 };
 const resendOtp = async (email, authType) => {
-    console.log({ email, authType });
     const isUserExist = await user_model_1.User.findOne({
         email: email.toLowerCase().trim(),
         status: { $in: [user_1.USER_STATUS.ACTIVE, user_1.USER_STATUS.RESTRICTED] },

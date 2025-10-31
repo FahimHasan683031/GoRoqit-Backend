@@ -56,7 +56,7 @@ const getAllJobs = (0, catchAsync_1.default)(async (req, res) => {
 });
 const deleteJob = (0, catchAsync_1.default)(async (req, res) => {
     const { id } = req.params;
-    const result = await job_service_1.JobServices.deleteJob(id);
+    const result = await job_service_1.JobServices.deleteJob(req.user, id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_codes_1.StatusCodes.OK,
         success: true,

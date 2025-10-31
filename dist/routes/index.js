@@ -17,6 +17,7 @@ const chat_routes_1 = require("../app/modules/chat/chat.routes");
 const message_routes_1 = require("../app/modules/message/message.routes");
 const category_route_1 = require("../app/modules/category/category.route");
 const dashboard_rout_1 = require("../app/modules/dashboard/dashboard.rout");
+const newsletter_route_1 = require("../app/modules/newsletter/newsletter.route");
 const router = express_1.default.Router();
 const apiRoutes = [
     { path: '/user', route: user_route_1.UserRoutes },
@@ -32,6 +33,7 @@ const apiRoutes = [
     { path: '/message', route: message_routes_1.MessageRoutes },
     { path: '/category', route: category_route_1.categoryRoutes },
     { path: '/dashboard', route: dashboard_rout_1.DashboardRoutes },
+    { path: '/newsletter', route: newsletter_route_1.newsletterRoutes },
 ];
 apiRoutes.forEach(route => {
     router.use(route.path, route.route);

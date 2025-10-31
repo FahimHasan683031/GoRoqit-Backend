@@ -10,7 +10,7 @@ exports.userSignupSchema = zod_1.z.object({
         companyName: zod_1.z.string().optional(),
         role: zod_1.z.nativeEnum(user_interface_1.USER_ROLES),
         image: zod_1.z.string().optional(),
-        password: zod_1.z.string().min(8),
+        password: zod_1.z.string().min(6),
     })
 });
 exports.userLoginSchema = zod_1.z.object({

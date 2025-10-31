@@ -12,16 +12,11 @@ import { emailHelper } from '../../../helpers/emailHelper'
 // import { emailQueue } from '../../../helpers/bull-mq-producer'
 
 const handleLoginLogic = async (payload: ILoginData, isUserExist: IUser):Promise<IAuthResponse> => {
-
   const { authentication, verified, status, password } = isUserExist
-
   const { restrictionLeftAt, wrongLoginAttempts } = authentication
-
-
 
   if (!verified) {
     //send otp to user
-    
     const otp = generateOtp()
     const otpExpiresIn = new Date(Date.now() + 5 * 60 * 1000)
 
@@ -44,14 +39,9 @@ const handleLoginLogic = async (payload: ILoginData, isUserExist: IUser):Promise
       email: isUserExist.email!,
       otp,
     })
-
     // await emailHelper.sendEmail(otpTemplate)
-
     // emailQueue.add('emails', otpTemplate)
-
-
     return authResponse(StatusCodes.PROXY_AUTHENTICATION_REQUIRED, `An OTP has been sent to your ${payload.email}. Please verify.`)
-
   }
 
   if (status === USER_STATUS.DELETED) {
@@ -141,8 +131,6 @@ const handleLoginLogic = async (payload: ILoginData, isUserExist: IUser):Promise
 export const AuthCommonServices = {
   handleLoginLogic,
 }
-
-
 
 export const authResponse = (status: number, message: string,role?: string, accessToken?: string, refreshToken?: string, token?: string): IAuthResponse => {
   return {

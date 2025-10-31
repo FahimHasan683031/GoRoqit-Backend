@@ -13,9 +13,6 @@ const contactZodSchema = zod_1.z.object({
         })
             .email('Invalid email format'),
         phone: zod_1.z.string().optional(),
-        country: zod_1.z.string({
-            required_error: 'Country is required',
-        }),
         message: zod_1.z.string({
             required_error: 'Message is required',
         }),

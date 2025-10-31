@@ -11,9 +11,21 @@ const job_constants_1 = require("./job.constants");
 const mongoose_1 = require("mongoose");
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const category_model_1 = require("../category/category.model");
+const user_interface_1 = require("../user/user.interface");
 const application_model_1 = require("../application/application.model");
+const user_model_1 = require("../user/user.model");
 const createJob = async (user, payload) => {
     try {
+        const isExistUser = await user_model_1.User.findById(user.authId);
+        if (!isExistUser) {
+            throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'User not found!');
+        }
+        if (!isExistUser.profileCompletion || isExistUser.profileCompletion < 70) {
+            throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Please complete your profile first!');
+        }
+        if (user.role !== user_interface_1.USER_ROLES.RECRUITER) {
+            throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Only Recruiters can create jobs');
+        }
         const checkCategory = await category_model_1.Category.findOne({ name: payload.category });
         if (!checkCategory) {
             throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Category not found, please try again with valid category name.');
@@ -89,13 +101,20 @@ const updateJob = async (id, payload) => {
     }
     return result;
 };
-const deleteJob = async (id) => {
+const deleteJob = async (user, id) => {
     if (!mongoose_1.Types.ObjectId.isValid(id)) {
         throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Invalid Job ID');
     }
+    const isExistJob = await job_model_1.Job.findById(id);
+    if (!isExistJob) {
+        throw new ApiError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, 'Requested job not found, please try again with valid id');
+    }
+    if (user.role !== user_interface_1.USER_ROLES.ADMIN && isExistJob.user.toString() !== user.authId) {
+        throw new ApiError_1.default(http_status_codes_1.StatusCodes.FORBIDDEN, 'You are not authorized to delete this job');
+    }
     const result = await job_model_1.Job.findByIdAndDelete(id);
     if (!result) {
-        throw new ApiError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, 'Something went wrong while deleting job, please try again with valid id.');
+        throw new ApiError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, 'Requested job not found while deleting job, please try again with valid id.');
     }
     return result;
 };

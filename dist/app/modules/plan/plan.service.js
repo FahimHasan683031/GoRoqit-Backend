@@ -12,6 +12,8 @@ const createStripeProductCatalog_1 = require("../../../stripe/createStripeProduc
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const deleteStripeProductCatalog_1 = require("../../../stripe/deleteStripeProductCatalog");
 const subscription_model_1 = require("../subscription/subscription.model");
+const createCheckoutSession_1 = require("../../../stripe/createCheckoutSession");
+// Create plan in DB and Stripe Product
 const createPlanToDB = async (payload) => {
     const productPayload = {
         title: payload.title,
@@ -24,7 +26,6 @@ const createPlanToDB = async (payload) => {
         throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Failed to create subscription product');
     }
     if (product) {
-        payload.paymentLink = product.paymentLink;
         payload.productId = product.productId;
         payload.priceId = product.priceId;
     }
@@ -35,6 +36,11 @@ const createPlanToDB = async (payload) => {
     }
     return result;
 };
+const creatSession = async (user, planId) => {
+    const url = await (0, createCheckoutSession_1.createCheckoutSession)(user, planId);
+    return { url };
+};
+// Update plan in DB and Stripe Product
 const updatePlanToDB = async (id, payload) => {
     var _a, _b, _c;
     if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
@@ -73,11 +79,6 @@ const updatePlanToDB = async (id, payload) => {
             product: productId,
         });
         payload.priceId = price.id;
-        // Optional: generate a new Payment Link
-        const paymentLink = await stripe_1.default.paymentLinks.create({
-            line_items: [{ price: price.id, quantity: 1 }],
-        });
-        payload.paymentLink = paymentLink.url;
     }
     // 4. Update MongoDB
     const result = await plan_model_1.Plan.findByIdAndUpdate(id, { $set: payload }, { new: true });
@@ -86,6 +87,7 @@ const updatePlanToDB = async (id, payload) => {
     }
     return result;
 };
+// Get plan from DB
 const getPlanFromDB = async (paymentType) => {
     const query = {
         status: 'Active',
@@ -113,6 +115,7 @@ const getPlanFromDB = async (paymentType) => {
         meta,
     };
 };
+// Get plan details from DB
 const getPlanDetailsFromDB = async (id) => {
     if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
         throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Invalid ID');
@@ -120,6 +123,7 @@ const getPlanDetailsFromDB = async (id) => {
     const result = await plan_model_1.Plan.findById(id);
     return result;
 };
+// Delete plan from DB and Stripe
 const deletePlanToDB = async (id) => {
     if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
         throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Invalid ID');
@@ -143,4 +147,5 @@ exports.PackageService = {
     getPlanFromDB,
     getPlanDetailsFromDB,
     deletePlanToDB,
+    creatSession,
 };

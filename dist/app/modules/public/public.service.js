@@ -10,6 +10,7 @@ const public_model_1 = require("./public.model");
 const user_model_1 = require("../user/user.model");
 const emailHelper_1 = require("../../../helpers/emailHelper");
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
+const emailTemplate_1 = require("../../../shared/emailTemplate");
 const createPublic = async (payload) => {
     const isExist = await public_model_1.Public.findOne({
         type: payload.type,
@@ -57,41 +58,13 @@ const createContact = async (payload) => {
         if (!admin || !admin.email) {
             throw new ApiError_1.default(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR, 'Admin user not found');
         }
-        // Send email notification to admin
-        const emailData = {
-            to: admin.email,
-            subject: 'New Contact Form Submission',
-            html: `
-        <h1>New Contact Form Submission</h1>
-        <p>You have received a new message from the contact form:</p>
-        <ul>
-          <li><strong>Name:</strong> ${payload.name}</li>
-          <li><strong>Email:</strong> ${payload.email}</li>
-          <li><strong>Phone:</strong> ${payload.phone}</li>
-        </ul>
-        <h2>Message:</h2>
-        <p>${payload.message}</p>
-        <p>You can respond directly to the sender by replying to: ${payload.email}</p>
-      `,
-        };
-        await emailHelper_1.emailHelper.sendEmail(emailData);
-        // Send confirmation email to the user
-        const userEmailData = {
-            to: payload.email,
-            subject: 'Thank you for contacting us',
-            html: `
-        <h1>Thank You for Contacting Us</h1>
-        <p>Dear ${payload.name},</p>
-        <p>We have received your message and will get back to you as soon as possible.</p>
-        <p>Here's a copy of your message:</p>
-        <p><em>${payload.message}</em></p>
-        <p>Best regards,<br>The Healthcare and Financial Consultants Team</p>
-      `,
-        };
-        await emailHelper_1.emailHelper.sendEmail(userEmailData);
         const result = await public_model_1.Contact.create(payload);
         if (!result)
             throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Failed to create Contact');
+        // send admin email
+        await emailHelper_1.emailHelper.sendEmail(emailTemplate_1.emailTemplate.adminContactNotificationEmail(payload));
+        // send user email
+        await emailHelper_1.emailHelper.sendEmail(emailTemplate_1.emailTemplate.userContactConfirmationEmail(payload));
         return {
             message: 'Contact form submitted successfully',
         };
@@ -102,11 +75,14 @@ const createContact = async (payload) => {
 };
 const getAllContacts = async (query) => {
     const contactQueryBuilder = new QueryBuilder_1.default(public_model_1.Contact.find(), query);
-    const result = await contactQueryBuilder.modelQuery;
-    const paginationResult = await contactQueryBuilder.paginate();
+    contactQueryBuilder.paginate();
+    const result = await contactQueryBuilder.modelQuery.lean();
+    // Get pagination info separately
+    const paginationResult = await contactQueryBuilder.getPaginationInfo();
+    // Return clean objects without circular references
     return {
         meta: paginationResult,
-        data: result,
+        result,
     };
 };
 const createFaq = async (payload) => {

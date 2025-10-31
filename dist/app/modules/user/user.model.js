@@ -93,6 +93,7 @@ const UserSchema = new mongoose_1.Schema({
         type: String,
         required: false,
     },
+    profileCompletion: { type: Number, default: 0 },
     authentication: {
         _id: false,
         select: false,

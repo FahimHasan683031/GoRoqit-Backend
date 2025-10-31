@@ -21,6 +21,7 @@ class QueryBuilder {
         return this;
     }
     // Filtering
+    // Filtering
     filter() {
         const queryObj = { ...this.query };
         const excludeFields = [
@@ -34,25 +35,26 @@ class QueryBuilder {
             'download',
         ];
         excludeFields.forEach(el => delete queryObj[el]);
+        const filters = cleanObject(queryObj);
         // Handle salary range filtering
         if (queryObj.minSalary || queryObj.maxSalary) {
-            const salaryFilter = {};
             if (queryObj.minSalary) {
-                salaryFilter.minSalary = { $gte: Number(queryObj.minSalary) };
+                filters.minSalary = { $gte: Number(queryObj.minSalary) };
                 delete queryObj.minSalary;
             }
             if (queryObj.maxSalary) {
-                salaryFilter.maxSalary = { $lte: Number(queryObj.maxSalary) };
+                filters.maxSalary = { $lte: Number(queryObj.maxSalary) };
                 delete queryObj.maxSalary;
             }
-            this.modelQuery = this.modelQuery.find({
-                ...cleanObject(queryObj),
-                ...salaryFilter,
-            });
         }
-        else {
-            this.modelQuery = this.modelQuery.find(cleanObject(queryObj));
+        // ✅ Add partial match for jobLocation
+        if (this.query.jobLocation) {
+            filters.jobLocation = {
+                $regex: this.query.jobLocation,
+                $options: 'i', // case-insensitive
+            };
         }
+        this.modelQuery = this.modelQuery.find(filters);
         return this;
     }
     // Sorting

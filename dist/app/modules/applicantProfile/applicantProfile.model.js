@@ -35,6 +35,8 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ApplicantProfile = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const user_model_1 = require("../user/user.model");
+const calculateProfileCompleation_1 = require("../../../helpers/calculateProfileCompleation");
 const EducationSchema = new mongoose_1.Schema({
     degreeTitle: { type: String, required: true },
     instituteName: { type: String, required: true },
@@ -44,6 +46,7 @@ const EducationSchema = new mongoose_1.Schema({
     duration: String,
     yearOfPassing: Number,
     cgpa: Number,
+    certificate: { type: String, default: null },
 }, { _id: false });
 const WorkExperienceSchema = new mongoose_1.Schema({
     jobTitle: { type: String, required: true },
@@ -56,6 +59,11 @@ const WorkExperienceSchema = new mongoose_1.Schema({
     startDate: Date,
     endDate: Date,
     experience: String,
+}, { _id: false });
+const PortfolioSchema = new mongoose_1.Schema({
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    portfolioImages: { type: [String], default: [] },
 }, { _id: false });
 const ApplicantProfileSchema = new mongoose_1.Schema({
     userId: {
@@ -77,10 +85,11 @@ const ApplicantProfileSchema = new mongoose_1.Schema({
     salaryExpectation: { type: String, default: null },
     expartes: { type: [String], default: [] },
     openToWork: { type: Boolean, default: false },
-    firstName: { type: String, required: true, trim: true, maxlength: 50 },
-    lastName: { type: String, trim: true, maxlength: 50 },
-    middleName: { type: String, trim: true, maxlength: 50 },
-    preferredName: { type: String, trim: true, maxlength: 50 },
+    portfolio: { type: [PortfolioSchema], default: [] },
+    firstName: { type: String, required: true, trim: true, default: null },
+    lastName: { type: String, trim: true, default: null },
+    middleName: { type: String, trim: true, default: null },
+    preferredName: { type: String, trim: true, default: null },
     gender: { type: String, enum: ["Male", "Female", "Other"], default: null },
     maritalStatus: { type: String, enum: ["Single", "Married", "Divorced", "Widowed"], default: null },
     citizenship: { type: String, default: null },
@@ -93,9 +102,35 @@ const ApplicantProfileSchema = new mongoose_1.Schema({
     zipCode: { type: String, default: null },
     province: { type: String, default: null },
     mobile: { type: String, default: null },
+    yearsOfExperience: { type: String, default: null },
     landLine: { type: String, default: null },
-    bio: { type: String, maxlength: 500, default: null },
+    bio: { type: String, default: null },
 }, { timestamps: true });
+ApplicantProfileSchema.pre("save", async function (next) {
+    const fields = [
+        "resume", "skills", "preferredWorkType",
+        "languages", "salaryExpectation", "expartes", "firstName",
+        "lastName", "gender", "maritalStatus", "citizenship",
+        "dateOfBirth", "streetAddress", "country", "city", "zipCode", "mobile", "bio"
+    ];
+    const docObject = this.toObject ? this.toObject() : this;
+    this._completion = (0, calculateProfileCompleation_1.calculateCompletion)(docObject, fields);
+    next();
+});
+// Add this after your existing post-save hook
+ApplicantProfileSchema.post('findOneAndUpdate', async function (doc) {
+    if (!doc)
+        return;
+    const fields = [
+        "resume", "skills", "preferredWorkType",
+        "languages", "salaryExpectation", "expartes", "firstName",
+        "lastName", "gender", "maritalStatus", "citizenship",
+        "dateOfBirth", "streetAddress", "country", "city", "zipCode", "mobile", "bio"
+    ];
+    const docObject = doc.toObject ? doc.toObject() : doc;
+    const percentage = (0, calculateProfileCompleation_1.calculateCompletion)(docObject, fields);
+    await user_model_1.User.findByIdAndUpdate(doc.userId, { profileCompletion: percentage });
+});
 ApplicantProfileSchema.index({ skills: 1 });
 ApplicantProfileSchema.index({ openToWork: 1 });
 exports.ApplicantProfile = mongoose_1.default.model("ApplicantProfile", ApplicantProfileSchema);

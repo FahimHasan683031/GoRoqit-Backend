@@ -44,6 +44,7 @@ const createAdmin = async () => {
     if (!result) {
         throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Failed to create admin');
     }
+    logger_1.logger.log('info', 'Admin account created successfully.');
     return result[0];
 };
 const getAllUser = async (query) => {
@@ -61,12 +62,10 @@ const getAllUser = async (query) => {
     const totalApplicants = await user_model_1.User.countDocuments({
         role: user_1.USER_ROLES.APPLICANT,
     });
-    const staticData = { totalUsers,
-        totalRecruiters,
-        totalApplicants,
-    };
+    const staticData = { totalUsers, totalRecruiters, totalApplicants };
     return {
-        users, staticData,
+        users,
+        staticData,
         meta: paginationInfo,
     };
 };
@@ -99,7 +98,17 @@ const updateUserRoleAndCreateProfile = async (id, role, profileData) => {
 };
 // delete User
 const deleteUser = async (id) => {
+    const user = await user_model_1.User.findById(id);
+    if (!user) {
+        throw new ApiError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, 'User not found');
+    }
     const result = await user_model_1.User.findByIdAndDelete(id);
+    if (user.role === user_1.USER_ROLES.APPLICANT) {
+        await applicantProfile_model_1.ApplicantProfile.findByIdAndDelete(user.profile);
+    }
+    else if (user.role === user_1.USER_ROLES.RECRUITER) {
+        await recruiterProfile_model_1.RecruiterProfile.findByIdAndDelete(user.profile);
+    }
     return result;
 };
 const updateProfile = async (user, payload) => {
@@ -128,6 +137,9 @@ const updateProfile = async (user, payload) => {
     }, { new: true });
     // 2. Update role-based profile
     if (isExistUser.role === user_1.USER_ROLES.APPLICANT && isExistUser.profile) {
+        if (payload.openToWork && isExistUser.profileCompletion < 60) {
+            throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Please complete your profile first!');
+        }
         const res = await applicantProfile_model_1.ApplicantProfile.findByIdAndUpdate(isExistUser.profile, payload, { new: true });
         // return "Profile updated successfully.";
         return res;
@@ -142,6 +154,24 @@ const updateProfile = async (user, payload) => {
     }
 };
 exports.updateProfile = updateProfile;
+const addApplicantPortfolio = async (user, portfolioData) => {
+    var _a;
+    const profile = await applicantProfile_model_1.ApplicantProfile.findOne({ userId: user.authId });
+    if (!profile) {
+        throw new ApiError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, 'Applicant profile not found');
+    }
+    (_a = profile.portfolio) === null || _a === void 0 ? void 0 : _a.push(portfolioData);
+    return await profile.save();
+};
+const removeApplicantPortfolio = async (user, title) => {
+    var _a;
+    const profile = await applicantProfile_model_1.ApplicantProfile.findOne({ userId: user.authId });
+    if (!profile) {
+        throw new ApiError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, 'Applicant profile not found');
+    }
+    profile.portfolio = (_a = profile.portfolio) === null || _a === void 0 ? void 0 : _a.filter(item => item.title !== title);
+    return await profile.save();
+};
 const getProfile = async (user) => {
     const isExistUser = await user_model_1.User.findById(user.authId)
         .populate('profile')
@@ -160,13 +190,20 @@ const getCurrentUser = async (user) => {
 };
 const getApplicants = async (query) => {
     const applicantQueryBuilder = new QueryBuilder_1.default(applicantProfile_model_1.ApplicantProfile.find({ openToWork: true }), query)
-        .search(["firstName", "lastName", "preferredName", "skills", "city", "country"])
+        .search([
+        'firstName',
+        'lastName',
+        'preferredName',
+        'skills',
+        'city',
+        'country',
+    ])
         .filter()
         .sort()
         .fields()
         .paginate()
-        .populate(["userId"], {
-        userId: "email name role image status verified",
+        .populate(['userId'], {
+        userId: 'email name role image status verified',
     });
     const applicants = await applicantQueryBuilder.modelQuery.lean();
     const paginationInfo = await applicantQueryBuilder.getPaginationInfo();
@@ -174,6 +211,25 @@ const getApplicants = async (query) => {
         data: applicants,
         meta: paginationInfo,
     };
+};
+const deleteMyAccount = async (user) => {
+    const isExistUser = await user_model_1.User.findById(user.authId);
+    if (!isExistUser) {
+        throw new ApiError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, 'The requested profile not found or deleted.');
+    }
+    if (isExistUser.role === user_1.USER_ROLES.APPLICANT && isExistUser.profile) {
+        const res = await applicantProfile_model_1.ApplicantProfile.findByIdAndDelete(isExistUser.profile);
+        if (res) {
+            await user_model_1.User.findByIdAndDelete(isExistUser._id);
+        }
+    }
+    else if (isExistUser.role === user_1.USER_ROLES.RECRUITER && isExistUser.profile) {
+        const res = await recruiterProfile_model_1.RecruiterProfile.findByIdAndDelete(isExistUser.profile);
+        if (res) {
+            await user_model_1.User.findByIdAndDelete(isExistUser._id);
+        }
+    }
+    return 'Account deleted successfully';
 };
 exports.UserServices = {
     updateProfile: exports.updateProfile,
@@ -184,5 +240,8 @@ exports.UserServices = {
     deleteUser,
     getProfile,
     getApplicants,
-    getCurrentUser
+    getCurrentUser,
+    deleteMyAccount,
+    addApplicantPortfolio,
+    removeApplicantPortfolio,
 };

@@ -30,12 +30,11 @@ const googleAuthCallback = (0, catchAsync_1.default)(async (req, res) => {
     console.log("Google Auth Callback", req.user);
     const result = await passport_auth_service_1.PassportAuthServices.handleGoogleLogin(req.user);
     const { status, message, accessToken, refreshToken, role } = result;
-    (0, sendResponse_1.default)(res, {
-        statusCode: status,
-        success: true,
-        message: message,
-        data: { accessToken, role },
+    res.cookie("refreshToken", refreshToken, {
+        secure: config_1.default.node_env === "production",
+        httpOnly: true,
     });
+    res.redirect(config_1.default.google_redirect_url ? `${config_1.default.google_redirect_url}?accessToken=${accessToken}&refreshToken=${refreshToken}&role=${role}` : "https://goroqit.com");
 });
 exports.PassportAuthController = {
     login,

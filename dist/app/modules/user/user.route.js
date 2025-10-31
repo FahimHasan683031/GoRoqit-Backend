@@ -10,20 +10,23 @@ const auth_1 = __importDefault(require("../../middleware/auth"));
 const user_1 = require("../../../enum/user");
 const processReqBody_1 = require("../../middleware/processReqBody");
 const router = express_1.default.Router();
-router.patch('/profile', (0, auth_1.default)(user_1.USER_ROLES.APPLICANT, user_1.USER_ROLES.ADMIN, user_1.USER_ROLES.RECRUITER), (0, processReqBody_1.fileAndBodyProcessorUsingDiskStorage)(), 
-// validateProfileUpdate,
-// validateRequest(RecruiterProfileUpdateSchema),
-user_controller_1.UserController.updateProfile);
+router.patch('/profile', (0, auth_1.default)(user_1.USER_ROLES.APPLICANT, user_1.USER_ROLES.ADMIN, user_1.USER_ROLES.RECRUITER), (0, processReqBody_1.fileAndBodyProcessorUsingDiskStorage)(), user_controller_1.UserController.updateProfile);
 router.get('/me', (0, auth_1.default)(user_1.USER_ROLES.APPLICANT, user_1.USER_ROLES.RECRUITER, user_1.USER_ROLES.ADMIN), user_controller_1.UserController.getProfile);
-router.get('/', user_controller_1.UserController.getAllUser),
+router.get('/', (0, auth_1.default)(user_1.USER_ROLES.ADMIN), user_controller_1.UserController.getAllUser),
     // get applicants
     router.get('/applicants', user_controller_1.UserController.getApplicants);
 // get current user
 router.get('/current-user', (0, auth_1.default)(user_1.USER_ROLES.APPLICANT, user_1.USER_ROLES.RECRUITER, user_1.USER_ROLES.ADMIN), user_controller_1.UserController.getCurrentUser);
+// delete my account
+router.delete('/me', (0, auth_1.default)(user_1.USER_ROLES.APPLICANT, user_1.USER_ROLES.RECRUITER, user_1.USER_ROLES.ADMIN), user_controller_1.UserController.deleteMyAccount);
+// add applicant portfolio
+router.post('/applicants/portfolio', (0, auth_1.default)(user_1.USER_ROLES.APPLICANT), (0, processReqBody_1.fileAndBodyProcessorUsingDiskStorage)(), user_controller_1.UserController.addApplicantPortfolio);
+// remove applicant portfolio
+router.delete('/applicants/portfolio/:title', (0, auth_1.default)(user_1.USER_ROLES.APPLICANT), user_controller_1.UserController.removeApplicantPortfolio);
 // get single user
 router.get('/:id', user_controller_1.UserController.getSingleUser);
 // update user role and create profile
 router.patch('/:id/role', user_controller_1.UserController.updateUserRoleAndCreateProfile);
 // delete user
-router.delete('/:id', user_controller_1.UserController.deleteUser);
+router.delete('/:id', (0, auth_1.default)(user_1.USER_ROLES.ADMIN), user_controller_1.UserController.deleteUser);
 exports.UserRoutes = router;

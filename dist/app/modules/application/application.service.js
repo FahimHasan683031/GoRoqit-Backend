@@ -44,10 +44,19 @@ const mongoose_1 = __importStar(require("mongoose"));
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const job_model_1 = require("../job/job.model");
 const user_interface_1 = require("../user/user.interface");
+const user_model_1 = require("../user/user.model");
+const notifications_model_1 = require("../notifications/notifications.model");
 const createApplication = async (user, payload) => {
     const session = await mongoose_1.default.startSession();
     try {
         session.startTransaction();
+        const isExistUser = await user_model_1.User.findById(user.authId);
+        if (!isExistUser) {
+            throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'User not found!');
+        }
+        if (!isExistUser.profileCompletion || isExistUser.profileCompletion < 60) {
+            throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Please complete your profile first!');
+        }
         const job = await job_model_1.Job.findById(payload.job);
         if (!job) {
             throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "Job doesn't exist!");
@@ -71,6 +80,12 @@ const createApplication = async (user, payload) => {
         if (!updatedJob) {
             throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Failed to update job application count');
         }
+        await notifications_model_1.Notification.create({
+            to: job.user,
+            from: user.authId,
+            title: 'New Application Received',
+            body: `A new application has been received for your job: ${job.title}`,
+        }, { session });
         await session.commitTransaction();
         return application;
     }
@@ -107,7 +122,7 @@ const getAllApplications = async (user, query) => {
         {
             path: 'author',
             select: 'companyName',
-        }
+        },
     ]);
     const applications = await applicationQuery.modelQuery;
     const paginationInfo = await applicationQuery.getPaginationInfo();
@@ -120,7 +135,11 @@ const getSingleApplication = async (id) => {
     if (!mongoose_1.Types.ObjectId.isValid(id)) {
         throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Invalid Application ID');
     }
-    const result = await application_model_1.Application.findById(id).populate(['job', 'applicant', 'author']);
+    const result = await application_model_1.Application.findById(id).populate([
+        'job',
+        'applicant',
+        'author',
+    ]);
     if (!result) {
         throw new ApiError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, 'Requested Application not found, please try again with valid id');
     }
@@ -145,7 +164,7 @@ const deleteApplication = async (id) => {
     }
     const result = await application_model_1.Application.findByIdAndDelete(id);
     if (!result) {
-        throw new ApiError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, 'Something went wrong while deleting Application, please try again with valid id.');
+        throw new ApiError_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, 'Requested Application not found while deleting Application, please try again with valid id.');
     }
     return result;
 };

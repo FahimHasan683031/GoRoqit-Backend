@@ -76,6 +76,26 @@ const getProfile = (0, catchAsync_1.default)(async (req, res) => {
         data: result,
     });
 });
+// add applicant portfolio
+const addApplicantPortfolio = (0, catchAsync_1.default)(async (req, res) => {
+    const result = await user_service_1.UserServices.addApplicantPortfolio(req.user, req.body);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_codes_1.StatusCodes.OK,
+        success: true,
+        message: 'Portfolio added successfully',
+        data: result,
+    });
+});
+// remove applicant portfolio
+const removeApplicantPortfolio = (0, catchAsync_1.default)(async (req, res) => {
+    const result = await user_service_1.UserServices.removeApplicantPortfolio(req.user, req.params.title);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_codes_1.StatusCodes.OK,
+        success: true,
+        message: 'Portfolio removed successfully',
+        data: result,
+    });
+});
 // get applicants
 const getApplicants = (0, catchAsync_1.default)(async (req, res) => {
     const result = await user_service_1.UserServices.getApplicants(req.query);
@@ -96,6 +116,15 @@ const getCurrentUser = (0, catchAsync_1.default)(async (req, res) => {
         data: result,
     });
 });
+// delete my account
+const deleteMyAccount = (0, catchAsync_1.default)(async (req, res) => {
+    const result = await user_service_1.UserServices.deleteMyAccount(req.user);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_codes_1.StatusCodes.OK,
+        success: true,
+        message: result,
+    });
+});
 exports.UserController = {
     getAllUser,
     updateProfile,
@@ -104,5 +133,8 @@ exports.UserController = {
     updateUserRoleAndCreateProfile,
     getProfile,
     getApplicants,
-    getCurrentUser
+    getCurrentUser,
+    deleteMyAccount,
+    addApplicantPortfolio,
+    removeApplicantPortfolio
 };

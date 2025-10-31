@@ -50,6 +50,7 @@ exports.ApplicantProfileUpdateSchema = zod_1.z.object({
     previousEmployment: zod_1.z.enum(["Yes", "No"]).optional(),
     streetAddress: zod_1.z.string().optional(),
     country: zod_1.z.string().optional(),
+    yearsOfExperience: zod_1.z.string().optional(),
     city: zod_1.z.string().optional(),
     zipCode: zod_1.z.string().optional(),
     province: zod_1.z.string().optional(),
