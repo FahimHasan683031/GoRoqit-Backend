@@ -13,7 +13,7 @@ const EducationSchema = new Schema<IEducation>(
     duration: String,
     yearOfPassing: Number,
     cgpa: Number,
-    certificate: { type: String, default: null },
+    certificate: { type: [String], default: [] },
   },
   { _id: false }
 );
@@ -63,7 +63,14 @@ const ApplicantProfileSchema = new Schema<IApplicantProfile>(
       default: null,
     },
     languages: { type: [String], default: [] },
-    salaryExpectation: { type: String, default: null },
+    salaryExpectation: {
+      type: {
+        type: String,
+        enum: ["yearly", "monthly", "weekly", "hourly"],
+        default: null,
+      },
+      amount: { type: Number, default: null },
+    },
     expartes: { type: [String], default: [] },
     openToWork: { type: Boolean, default: false },
     portfolio: { type: [PortfolioSchema], default: [] },

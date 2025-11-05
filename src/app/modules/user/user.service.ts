@@ -5,7 +5,7 @@ import { User } from './user.model'
 import { USER_ROLES, USER_STATUS } from '../../../enum/user'
 import { JwtPayload } from 'jsonwebtoken'
 import { logger } from '../../../shared/logger'
-import { IProfile } from '../profile/profile.interface'
+import { IEducation, IProfile } from '../profile/profile.interface'
 import { Profile } from '../profile/profile.model'
 import { authResponse } from '../auth/common'
 import { AuthHelper } from '../auth/auth.helper'
@@ -137,6 +137,9 @@ const deleteUser = async (id: string) => {
   if (!user) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
   }
+  if(user.role === USER_ROLES.ADMIN){
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin cannot be deleted')
+  }
   const result = await User.findByIdAndDelete(id)
   if (user.role === USER_ROLES.APPLICANT) {
     await ApplicantProfile.findByIdAndDelete(user.profile)
@@ -229,6 +232,26 @@ const removeApplicantPortfolio = async (user: JwtPayload, title: string) => {
   profile.portfolio = profile.portfolio?.filter(item => item.title !== title)
   return await profile.save()
 }
+const adApplicantEducation = async (
+  user: JwtPayload,
+  educationData: IEducation,
+) => {
+  const profile = await ApplicantProfile.findOne({ userId: user.authId })
+  if (!profile) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Applicant profile not found')
+  }
+  profile.education?.push(educationData)
+  return await profile.save()
+}
+
+const removeApplicantEducation = async (user: JwtPayload, title: string) => {
+  const profile = await ApplicantProfile.findOne({ userId: user.authId })
+  if (!profile) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Applicant profile not found')
+  }
+  profile.education = profile.education?.filter(item => item.degreeTitle !== title)
+  return await profile.save()
+}
 
 const getProfile = async (user: JwtPayload) => {
   const isExistUser = await User.findById(user.authId)
@@ -319,4 +342,6 @@ export const UserServices = {
   deleteMyAccount,
   addApplicantPortfolio,
   removeApplicantPortfolio,
+  adApplicantEducation,
+  removeApplicantEducation,
 }

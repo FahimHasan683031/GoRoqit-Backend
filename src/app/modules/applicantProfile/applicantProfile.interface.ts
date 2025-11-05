@@ -9,7 +9,7 @@ export type IEducation = {
   duration?: string;
   yearOfPassing?: number;
   cgpa?: number;
-  certificate?: string;
+  certificate?: string[];
 };
 
 
@@ -40,7 +40,10 @@ export type IApplicantProfile = {
   portfolio?: PortfolioData[];
   preferredWorkType?: "Full-time" | "Part-time" | "Contract" | "Internship" | "Other";
   languages?: string[];
-  salaryExpectation?: string;
+  salaryExpectation?: {
+    type:"yearly"|"monthly"|"weekly"|"hourly";
+    amount:number;
+  };
   openToWork: boolean;
   firstName?: string;
   middleName?: string;

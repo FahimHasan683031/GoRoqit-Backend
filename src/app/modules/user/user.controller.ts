@@ -107,6 +107,28 @@ const removeApplicantPortfolio = catchAsync(async (req: Request, res: Response) 
   })
 })
 
+// add applicant education
+const addApplicantEducation = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserServices.adApplicantEducation(req.user! as JwtPayload, req.body)
+  sendResponse<IApplicantProfile>(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Education added successfully',
+    data: result,
+  })
+})
+
+// remove applicant education
+const removeApplicantEducation = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserServices.removeApplicantEducation(req.user! as JwtPayload, req.params.title)
+  sendResponse<IApplicantProfile>(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Education removed successfully',
+    data: result,
+  })
+})
+
 
 
 // get applicants
@@ -154,5 +176,7 @@ export const UserController = {
   getCurrentUser,
   deleteMyAccount,
   addApplicantPortfolio,
-  removeApplicantPortfolio
+  removeApplicantPortfolio,
+  addApplicantEducation,
+  removeApplicantEducation,
 }

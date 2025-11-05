@@ -286,6 +286,7 @@ export const fileAndBodyProcessorUsingDiskStorage = () => {
           resume: processedFiles.resume,
           image: processedFiles.image,
           portfolioImages: processedFiles.portfolio, // ← your custom key
+          certificate: processedFiles.certificate,
         };
 
         next();

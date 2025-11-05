@@ -97,7 +97,5 @@ router.delete(
   CustomAuthController.deleteAccount,
 )
 router.post('/access-token', CustomAuthController.getAccessToken)
-
 router.post('/social-login', validateRequest(AuthValidations.socialLoginZodSchema), CustomAuthController.socialLogin)
-
 export const AuthRoutes = router

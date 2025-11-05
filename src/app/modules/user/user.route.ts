@@ -40,12 +40,25 @@ router.post(
   fileAndBodyProcessorUsingDiskStorage(),
   UserController.addApplicantPortfolio,
 )
+router.post(
+  '/applicants/education',
+  auth(USER_ROLES.APPLICANT),
+  fileAndBodyProcessorUsingDiskStorage(),
+  UserController.addApplicantEducation,
+)
 // remove applicant portfolio
 router.delete(
   '/applicants/portfolio/:title',
   auth(USER_ROLES.APPLICANT),
   UserController.removeApplicantPortfolio,
 )
+router.delete(
+  '/applicants/education/:title',
+  auth(USER_ROLES.APPLICANT),
+  UserController.removeApplicantEducation,
+)
+
+
 
 // get single user
 router.get('/:id', UserController.getSingleUser)

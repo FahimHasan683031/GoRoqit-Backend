@@ -10,6 +10,12 @@ const customLogin = catchAsync(async (req: Request, res: Response) => {
 
   const result = await CustomAuthServices.customLogin(loginData)
   const { status, message, accessToken, refreshToken, role } = result
+    if (refreshToken) {
+    res.cookie('refreshToken', refreshToken, {
+      secure: config.node_env === 'production',
+      httpOnly: true,
+    })
+  }
 
   sendResponse(res, {
     statusCode: status,
