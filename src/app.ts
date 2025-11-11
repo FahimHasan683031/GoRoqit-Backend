@@ -23,7 +23,7 @@ const allowedOrigins = [
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    if (origin.endsWith('.goroqit.com') || origin === 'https://goroqit.com') {
+    if (allowedOrigins.includes(origin) || origin.endsWith('.goroqit.com') || origin === 'https://goroqit.com') {
       callback(null, true);
     } else {
       console.log('🚫 Blocked by CORS:', origin);
