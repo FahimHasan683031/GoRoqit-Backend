@@ -38,7 +38,7 @@ export type IApplicantProfile = {
   education?: IEducation[];
   workExperience?: IWorkExperience[];
   portfolio?: PortfolioData[];
-  preferredWorkType?: "Full-time" | "Part-time" | "Contract" | "Internship" | "Other";
+  preferredWorkType?: "Full-time" | "Part-time" | "Temp" | "Self-employed" | "Chair-rental";
   languages?: string[];
   salaryExpectation?: {
     type:"yearly"|"monthly"|"weekly"|"hourly";
