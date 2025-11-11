@@ -355,7 +355,7 @@ const verifyAccount = async (email:string, onetimeCode: string):Promise<IAuthRes
     console.log(token.token)
 
     if(!token){
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong, please try again. or contact support.')
+      throw new ApiError(StatusCodes.BAD_REQUEST, ' please try again. or contact support.')
     }
     
 
