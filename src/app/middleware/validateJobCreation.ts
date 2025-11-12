@@ -24,25 +24,33 @@ export const validateJobCreation = async (
     }
 
     //Check subscription status
-    if (user.subscribe) {
+    if (!user.subscribe) {
+      return next(new ApiError(
+          StatusCodes.TOO_MANY_REQUESTS,
+          'you need to purchase one of our subscription plans to post a job.'
+        ));
+      
+    }
+    if(user.subscribe) {
       return next();
     }
 
-    //For non-subscribed recruiters
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const recentJob = await Job.findOne({
-      user: user._id,
-      createdAt: { $gte: thirtyDaysAgo }
-    }).sort({ createdAt: -1 });
+    // //For non-subscribed recruiters
+    // const thirtyDaysAgo = new Date();
+    // thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    if (recentJob) {
-        return next(new ApiError(
-          StatusCodes.TOO_MANY_REQUESTS,
-          'Job creation limited. Please subscribe to create more jobs.'
-        ));
-    }
+    // const recentJob = await Job.findOne({
+    //   user: user._id,
+    //   createdAt: { $gte: thirtyDaysAgo }
+    // }).sort({ createdAt: -1 });
+
+    // if (recentJob) {
+    //     return next(new ApiError(
+    //       StatusCodes.TOO_MANY_REQUESTS,
+    //       'Job creation limited. Please subscribe to create more jobs.'
+    //     ));
+    // }
 
     next();
   } catch (error) {
