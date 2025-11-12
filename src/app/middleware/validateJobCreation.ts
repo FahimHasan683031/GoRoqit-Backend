@@ -30,29 +30,14 @@ export const validateJobCreation = async (
           'you need to purchase one of our subscription plans to post a job.'
         ));
       
-    }
-    if(user.subscribe) {
+    }else if(user.subscribe) {
       return next();
+    }else{
+      return next(new ApiError(
+        StatusCodes.FORBIDDEN,
+        "Access denied. Only subscribed recruiters can create jobs."
+      ));
     }
-
-
-    // //For non-subscribed recruiters
-    // const thirtyDaysAgo = new Date();
-    // thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    // const recentJob = await Job.findOne({
-    //   user: user._id,
-    //   createdAt: { $gte: thirtyDaysAgo }
-    // }).sort({ createdAt: -1 });
-
-    // if (recentJob) {
-    //     return next(new ApiError(
-    //       StatusCodes.TOO_MANY_REQUESTS,
-    //       'Job creation limited. Please subscribe to create more jobs.'
-    //     ));
-    // }
-
-    next();
   } catch (error) {
     next(error);
   }
