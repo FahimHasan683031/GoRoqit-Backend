@@ -11,7 +11,6 @@ const ApplicationSchema = new Schema<IApplication, ApplicationModel>({
   email: { type: String ,required: true },
   phone: { type: String ,required: true },
   resume: { type: String ,required: true },
-  experience: { type: String ,required: true },
 }, {
   timestamps: true
 });

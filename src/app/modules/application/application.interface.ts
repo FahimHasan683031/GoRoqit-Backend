@@ -11,7 +11,6 @@ export interface IApplication {
   email: string
   phone: string
   resume: string
-  experience: string
 }
 
 export type ApplicationModel = Model<IApplication, {}, {}>

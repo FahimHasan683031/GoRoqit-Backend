@@ -10,7 +10,6 @@ import ApiError from "../errors/ApiError";
 
 export const createCheckoutSession = async (userdata:JwtPayload,planId:string) => {
   const { authId: userId } = userdata;
-  console.log(userId,planId)
 
 
   const user = await User.findById(userId);

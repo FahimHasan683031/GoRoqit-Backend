@@ -9,7 +9,9 @@ import { Job } from '../job/job.model'
 import { USER_ROLES } from '../user/user.interface'
 import { User } from '../user/user.model'
 import { Notification } from '../notifications/notifications.model'
+import { ApplicantProfile } from '../applicantProfile/applicantProfile.model'
 
+// create application
 export const createApplication = async (
   user: JwtPayload,
   payload: IApplication,
@@ -19,9 +21,13 @@ export const createApplication = async (
   try {
     session.startTransaction()
     const isExistUser = await User.findById(user.authId)
+
     if (!isExistUser) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found!')
     }
+    const userProfile = await ApplicantProfile.findById(isExistUser.profile)
+    if (!userProfile)
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'User profile not found!')
     if (!isExistUser.profileCompletion || isExistUser.profileCompletion < 60) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
@@ -51,11 +57,21 @@ export const createApplication = async (
         'You have already applied for this job',
       )
     }
+    const applicationData = {
+      job: job._id,
+      applicant: user.authId,
+      author: job.user,
+      name: isExistUser.name,
+      title: job.title,
+      location: `${userProfile.country},${userProfile.city},${userProfile.zipCode}`,
+      email: isExistUser.email,
+      phone: userProfile.mobile,
+      resume: userProfile.resume,
+    }
 
-    const createdApplication = await Application.create(
-      [{ ...payload, applicant: user.authId, author: job.user }],
-      { session },
-    )
+    const createdApplication = await Application.create([applicationData], {
+      session,
+    })
 
     if (!createdApplication || createdApplication.length === 0) {
       throw new ApiError(
@@ -105,6 +121,7 @@ export const createApplication = async (
   }
 }
 
+// Get All Applications
 const getAllApplications = async (
   user: JwtPayload,
   query: Record<string, unknown>,
@@ -139,6 +156,7 @@ const getAllApplications = async (
   }
 }
 
+// Get Single Application
 const getSingleApplication = async (id: string): Promise<IApplication> => {
   if (!Types.ObjectId.isValid(id)) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Application ID')
