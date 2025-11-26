@@ -137,7 +137,7 @@ const deleteUser = async (id: string) => {
   if (!user) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
   }
-  if(user.role === USER_ROLES.ADMIN){
+  if (user.role === USER_ROLES.ADMIN) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin cannot be deleted')
   }
   const result = await User.findByIdAndDelete(id)
@@ -212,25 +212,44 @@ export const updateProfile = async (
   }
 }
 
+// add applicant portfolio
 const addApplicantPortfolio = async (
   user: JwtPayload,
   portfolioData: PortfolioData,
 ) => {
-  const profile = await ApplicantProfile.findOne({ userId: user.authId })
-  if (!profile) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Applicant profile not found')
+  if (user.role === USER_ROLES.APPLICANT) {
+    const profile = await ApplicantProfile.findOne({ userId: user.authId })
+    if (!profile) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Applicant profile not found')
+    }
+    profile.portfolio?.push(portfolioData)
+    return await profile.save()
+  } else if (user.role === USER_ROLES.RECRUITER) {
+    const profile = await RecruiterProfile.findOne({ userId: user.authId })
+    if (!profile) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Recruiter profile not found')
+    }
+    profile.portfolio?.push(portfolioData)
+    return await profile.save()
   }
-  profile.portfolio?.push(portfolioData)
-  return await profile.save()
 }
 
 const removeApplicantPortfolio = async (user: JwtPayload, title: string) => {
-  const profile = await ApplicantProfile.findOne({ userId: user.authId })
-  if (!profile) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Applicant profile not found')
+  if (user.role === USER_ROLES.APPLICANT) {
+    const profile = await ApplicantProfile.findOne({ userId: user.authId })
+    if (!profile) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Applicant profile not found')
+    }
+    profile.portfolio = profile.portfolio?.filter(item => item.title !== title)
+    return await profile.save()
+  } else if (user.role === USER_ROLES.RECRUITER) {
+    const profile = await RecruiterProfile.findOne({ userId: user.authId })
+    if (!profile) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Recruiter profile not found')
+    }
+    profile.portfolio = profile.portfolio?.filter(item => item.title !== title)
+    return await profile.save()
   }
-  profile.portfolio = profile.portfolio?.filter(item => item.title !== title)
-  return await profile.save()
 }
 const adApplicantEducation = async (
   user: JwtPayload,
@@ -249,7 +268,9 @@ const removeApplicantEducation = async (user: JwtPayload, title: string) => {
   if (!profile) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Applicant profile not found')
   }
-  profile.education = profile.education?.filter(item => item.degreeTitle !== title)
+  profile.education = profile.education?.filter(
+    item => item.degreeTitle !== title,
+  )
   return await profile.save()
 }
 

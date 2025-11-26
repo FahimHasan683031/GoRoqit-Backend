@@ -88,7 +88,30 @@ const rectuterStatistics = async (user: JwtPayload, year?: string) => {
     totalChats,
   }
 }
+
+const homePageStatistics = async () => {
+  const totalJobs = await Job.countDocuments()
+  const totalApplications = await Application.countDocuments()
+  const totalUsers = await User.countDocuments()
+  const totalApplicants = await User.countDocuments({
+    role: USER_ROLES.APPLICANT,
+  })
+  const totalRecruiters = await User.countDocuments({
+    role: USER_ROLES.RECRUITER,
+  })
+
+  const data ={
+    totalUsers,
+    totalJobs,
+    totalRecruiters,
+    totalApplicants,
+    totalApplications,
+  }
+
+ return data
+}
 export const DashboardServices = {
   getDashboardStatistics,
-  rectuterStatistics
+  rectuterStatistics,
+  homePageStatistics
 }

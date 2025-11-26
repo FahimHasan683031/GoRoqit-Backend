@@ -11,7 +11,7 @@ import { ProfileRoutes } from '../app/modules/profile/profile.route'
 import { ChatRoutes } from '../app/modules/chat/chat.routes'
 import { MessageRoutes } from '../app/modules/message/message.routes'
 import { categoryRoutes } from '../app/modules/category/category.route'
-import { DashboardRoutes } from '../app/modules/dashboard/dashboard.rout'
+import { DashboardRoutes } from '../app/modules/dashboard/dashboard.route'
 import { newsletterRoutes } from '../app/modules/newsletter/newsletter.route'
 
 const router = express.Router()

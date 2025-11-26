@@ -113,7 +113,7 @@ const UserSchema = new Schema<IUser, UserModel>(
 );
 
 
-// UserSchema.index({ email: 1, status: 1 });
+
 
 UserSchema.statics.isPasswordMatched = async function (
   givenPassword: string,
@@ -130,7 +130,7 @@ UserSchema.pre<IUser>("save", async function (next) {
       email: this.email,
       status: { $in: [USER_STATUS.ACTIVE, USER_STATUS.RESTRICTED] },
     });
-console.log(isExist)
+
     if (isExist) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,

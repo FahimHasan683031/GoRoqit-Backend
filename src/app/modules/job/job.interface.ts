@@ -3,15 +3,15 @@ import { Types } from 'mongoose'
 export interface IJob {
   title: string
   category?: string
-  type: "Full-time" | "Part-time" | "Temp" | "Self-employed" | "Chair-rental";
+  type: "Full-time" | "Part-time" | "Temp" 
+  engagementType: "Self-employed" | "Chair-rental" | "Salaried"
   startDate: Date
-  endDate?: Date
+  salryType?: "yearly" | "monthly" | "weekly" | "hourly";
   minSalary: number
   maxSalary: number
   description?: string
-  responsibilities?: string
   jobLocation: string
   user: Types.ObjectId
-  experianceLabel: 'Experienced' | 'Beginner' | 'Freshers'
+  experianceLabel: 'Junior' | 'Mid-Level' | 'Senior'|"Master"
   applicationsCount?: number
 }

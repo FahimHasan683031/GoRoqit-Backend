@@ -1,8 +1,16 @@
 import mongoose, { Schema } from "mongoose";
-import { IRecruiterProfile } from "./recruiterProfile.interface";
+import { IRecruiterProfile, PortfolioData } from "./recruiterProfile.interface";
 import { calculateCompletion } from "../../../helpers/calculateProfileCompleation";
 import { User } from "../user/user.model";
 
+const PortfolioSchema = new Schema<PortfolioData>(
+  {
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    portfolioImages: { type: [String], default: [] },
+  },
+  { _id: false }
+);
 
 const RecruiterProfileSchema = new Schema<IRecruiterProfile>(
   {
@@ -13,17 +21,17 @@ const RecruiterProfileSchema = new Schema<IRecruiterProfile>(
       unique: true 
     },
     companyName: { type: String, required: true },
-    companyWebsite: { type: String, default:null },
-    companyDescription: { type: String, default:null },
-    companyLogo: { type: String, default:null },
-    phone: { type: String, default:null },
-    companyEmail: { type: String, default:null },
-    location: { type: String, default:null },
-    linkedinProfile: { type: String, default:null },
-    twitterProfile: { type: String, default:null },
-    facebookProfile: { type: String, default:null },
-    instagramProfile: { type: String, default:null },
-    bio: { type: String, maxlength: 500 },
+    companyWebsite: { type: String, required: false },
+    companyDescription: { type: String, required: false },
+    companyLogo: { type: String, required: false },
+    phone: { type: String, required: false },
+    companyEmail: { type: String, required: false },
+    location: { type: String, required: false },
+    linkedinProfile: { type: String, required: false },
+    twitterProfile: { type: String, required: false },
+    facebookProfile: { type: String, required: false },
+    portfolio: { type: [PortfolioSchema], default: [] },
+    instagramProfile: { type: String, required: false },
   },
   { timestamps: true }
 );

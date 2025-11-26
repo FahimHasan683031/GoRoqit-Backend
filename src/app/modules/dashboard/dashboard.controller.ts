@@ -23,10 +23,20 @@ const rectuterStatistics = catchAsync(async (req: Request, res: Response) => {
     data: result,
   })
 })
+const homePageStatistics = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardServices.homePageStatistics()
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Dashboard statistics fetched successfully',
+    data: result,
+  })
+})
 
 
 
 export const DashboardControllers = {
   getDashboardStatistics,
   rectuterStatistics,
+  homePageStatistics,
 }

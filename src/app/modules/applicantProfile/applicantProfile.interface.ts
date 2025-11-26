@@ -4,20 +4,17 @@ export type IEducation = {
   degreeTitle: string;
   instituteName: string;
   major?: string;
-  result?: string;
-  scale?: string;
   duration?: string;
-  yearOfPassing?: number;
-  cgpa?: number;
+  yearOfPassing?: string;
+  description?: string;
   certificate?: string[];
 };
-
 
 export type IWorkExperience = {
   jobTitle: string;
   companyName: string;
   location?: string;
-  employmentType: "Full-time" | "Part-time" | "Contract" | "Internship" | "Other";
+  employmentType?: "Full-time" | "Part-time" | "Temp" | "Self-employed" | "Chair-rental";
   startDate?: Date;
   endDate?: Date;
   experience?: string;
@@ -41,11 +38,11 @@ export type IApplicantProfile = {
   preferredWorkType?: "Full-time" | "Part-time" | "Temp" | "Self-employed" | "Chair-rental";
   languages?: string[];
   salaryExpectation?: {
-    type:"yearly"|"monthly"|"weekly"|"hourly";
-    amount:number;
+    type?: "yearly" | "monthly" | "weekly" | "hourly";
+    amount?: number;
   };
-  openToWork: boolean;
-  firstName?: string;
+  openToWork?: boolean;
+  firstName: string;
   middleName?: string;
   preferredName?: string;
   lastName?: string;
@@ -54,12 +51,11 @@ export type IApplicantProfile = {
   citizenship?: string;
   dateOfBirth?: Date;
   age?: number;
-  previousEmployment?:"Yes"|"No";
+  previousEmployment?: "Yes" | "No";
   streetAddress?: string;
   country?: string;
   city?: string;
   zipCode?: string;
-  province?: string;
   yearsOfExperience?: string;
   mobile?: string;
   landLine?: string;

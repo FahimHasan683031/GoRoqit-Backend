@@ -15,5 +15,9 @@ router.get(
   auth(USER_ROLES.RECRUITER),
   DashboardControllers.rectuterStatistics,
 )
+router.get(
+  '/home-page-statistics',
+  DashboardControllers.homePageStatistics,
+)
 
 export const DashboardRoutes = router
