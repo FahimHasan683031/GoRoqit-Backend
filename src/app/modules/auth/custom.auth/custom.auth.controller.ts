@@ -66,7 +66,7 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 })
 
 const verifyAccount = catchAsync(async (req: Request, res: Response) => {
-  const { oneTimeCode, phone, email } = req.body
+  const { oneTimeCode, email } = req.body
 
   const result = await CustomAuthServices.verifyAccount(email, oneTimeCode)
   const { status, message, accessToken, refreshToken, role, token } = result

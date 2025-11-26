@@ -312,9 +312,11 @@ const verifyAccount = async (email:string, onetimeCode: string):Promise<IAuthRes
   }
 
   const { authentication } = isUserExist
+  
 
   //check the otp
   if (authentication?.oneTimeCode !== onetimeCode) {
+    console.log(authentication.oneTimeCode, onetimeCode)
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid OTP, please try again.')
   }
 

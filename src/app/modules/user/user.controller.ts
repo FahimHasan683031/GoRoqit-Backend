@@ -88,7 +88,7 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
 // add applicant portfolio
 const addApplicantPortfolio = catchAsync(async (req: Request, res: Response) => {
   const result = await UserServices.addApplicantPortfolio(req.user! as JwtPayload, req.body)
-  sendResponse<IApplicantProfile>(res, {
+  sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: 'Portfolio added successfully',
@@ -99,7 +99,7 @@ const addApplicantPortfolio = catchAsync(async (req: Request, res: Response) => 
 // remove applicant portfolio
 const removeApplicantPortfolio = catchAsync(async (req: Request, res: Response) => {
   const result = await UserServices.removeApplicantPortfolio(req.user! as JwtPayload, req.params.title)
-  sendResponse<IApplicantProfile>(res, {
+  sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: 'Portfolio removed successfully',
