@@ -8,8 +8,8 @@ export const RecruiterProfileUpdateSchema = z.object({
   phone: z.string().optional(),
   companyEmail: z.string(),
   location: z.string().optional(),
-  linkedinProfile: z.string(),
-  twitterProfile: z.string(),
-  facebookProfile: z.string(),
-  instagramProfile: z.string(),
+  linkedinProfile: z.string().optional(),
+  twitterProfile: z.string().optional(),
+  facebookProfile: z.string().optional(),
+  instagramProfile: z.string().optional(),
 }).strict()
