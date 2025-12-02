@@ -8,6 +8,8 @@ import globalErrorHandler from './app/middleware/globalErrorHandler'
 import passport from './app/modules/auth/passport.auth/config/passport'
 import handleStripeWebhook from './stripe/handleStripeWebhook';
 
+// console.log("hellow world")
+
 //application
 const app = express();
 
