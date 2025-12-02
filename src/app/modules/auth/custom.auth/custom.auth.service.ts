@@ -54,12 +54,14 @@ export const createUser = async (payload: IUser) => {
     };
 
     // 3. Send OTP email
-    const createAccountEmail = emailTemplate.createAccount({
+    setTimeout(()=>{
+      const createAccountEmail = emailTemplate.createAccount({
       name: payload.name!,
       email: payload.email,
       otp,
     });
-    await emailHelper.sendEmail(createAccountEmail);
+     emailHelper.sendEmail(createAccountEmail);
+    },0)
 
     // 4. Create User
     const user = await User.create([{ ...payload, password: payload.password, authentication }], { session });
