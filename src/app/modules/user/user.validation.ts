@@ -75,7 +75,7 @@ export const UniversalProfileUpdateSchema = z.object({
     companyWebsite: z.string().optional(),
     companyDescription: z.string().optional(),
     companyLogo: z.string().optional(),
-    companyEmail: z.string(),
+    companyEmail: z.string().optional(),
     linkedinProfile: z.string().optional(),
     twitterProfile: z.string().optional(),
     facebookProfile: z.string().optional(),
