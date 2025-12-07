@@ -7,7 +7,6 @@ import { JobRoutes } from '../app/modules/job/job.route'
 import { ApplicationRoutes } from '../app/modules/application/application.route'
 import { PlanRoutes } from '../app/modules/plan/plan.routes'
 import { SubscriptionRoutes } from '../app/modules/subscription/subscription.routes'
-import { ProfileRoutes } from '../app/modules/profile/profile.route'
 import { ChatRoutes } from '../app/modules/chat/chat.routes'
 import { MessageRoutes } from '../app/modules/message/message.routes'
 import { categoryRoutes } from '../app/modules/category/category.route'
@@ -25,7 +24,6 @@ const apiRoutes: { path: string; route: Router }[] = [
   { path: '/application', route: ApplicationRoutes },
   { path: '/plan', route: PlanRoutes },
   { path: '/subscription', route: SubscriptionRoutes },
-  { path: '/profile', route: ProfileRoutes },
   { path: '/chat', route: ChatRoutes },
   { path: '/message', route: MessageRoutes },
   { path: '/category', route: categoryRoutes },

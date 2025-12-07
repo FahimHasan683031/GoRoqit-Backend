@@ -6,9 +6,10 @@ export interface IJob {
   type: "Full-time" | "Part-time" | "Temp" 
   engagementType: "Self-employed" | "Chair-rental" | "Salaried"
   startDate: Date
-  salryType?: "yearly" | "monthly" | "weekly" | "hourly";
-  minSalary: number
-  maxSalary: number
+  paymentType?: "yearly" | "monthly" | "weekly" | "hourly";
+  minSalary?: number
+  maxSalary?: number
+  rent?: number
   description?: string
   jobLocation: string
   user: Types.ObjectId

@@ -5,15 +5,14 @@ import { User } from './user.model'
 import { USER_ROLES, USER_STATUS } from '../../../enum/user'
 import { JwtPayload } from 'jsonwebtoken'
 import { logger } from '../../../shared/logger'
-import { IEducation, IProfile } from '../profile/profile.interface'
-import { Profile } from '../profile/profile.model'
 import { authResponse } from '../auth/common'
 import { AuthHelper } from '../auth/auth.helper'
 import { ApplicantProfile } from '../applicantProfile/applicantProfile.model'
 import { RecruiterProfile } from '../recruiterProfile/recruiterProfile.model'
 import QueryBuilder from '../../builder/QueryBuilder'
 import config from '../../../config'
-import { PortfolioData } from '../applicantProfile/applicantProfile.interface'
+import { IEducation, PortfolioData } from '../applicantProfile/applicantProfile.interface'
+import { IRecruiterProfile } from '../recruiterProfile/recruiterProfile.interface'
 
 const createAdmin = async (): Promise<Partial<IUser> | null> => {
   const admin = {
@@ -83,53 +82,6 @@ const getSingleUser = async (id: string) => {
   return result
 }
 
-// update userRole
-const updateUserRoleAndCreateProfile = async (
-  id: string,
-  role: string,
-  profileData: Partial<IProfile>,
-) => {
-  console.log('updateUserRoleAndCreateProfile', id, role, profileData)
-  console.log('role', role)
-  const user = await User.findById(id)
-  if (!user) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
-  }
-  if (user.role !== 'guest') {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Role already updated')
-  }
-
-  const profile = await Profile.create({
-    userId: user._id,
-    role,
-    ...profileData,
-  })
-
-  const result = await User.findByIdAndUpdate(
-    id,
-    { role, profile: profile._id },
-    { new: true },
-  )
-  if (!result) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      'Failed to update user role and create profile',
-    )
-  }
-  const tokens = AuthHelper.createToken(
-    result._id,
-    result.role,
-    result.name,
-    result.email,
-  )
-  return authResponse(
-    StatusCodes.OK,
-    `Welcome ${result.name} to our platform.`,
-    result.role,
-    tokens.accessToken,
-    tokens.refreshToken,
-  )
-}
 
 // delete User
 const deleteUser = async (id: string) => {
@@ -352,7 +304,6 @@ const deleteMyAccount = async (user: JwtPayload) => {
 
 export const UserServices = {
   updateProfile,
-  updateUserRoleAndCreateProfile,
   createAdmin,
   getAllUser,
   getSingleUser,

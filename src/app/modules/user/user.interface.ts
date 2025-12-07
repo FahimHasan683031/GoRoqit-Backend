@@ -1,5 +1,6 @@
 import { Model, Types } from "mongoose";
-import { IEducation, IWorkExperience } from "../profile/profile.interface";
+import { IEducation, IWorkExperience } from "../applicantProfile/applicantProfile.interface";
+
 
 export enum USER_ROLES {
   ADMIN = "admin",
