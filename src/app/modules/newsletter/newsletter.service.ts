@@ -1,3 +1,4 @@
+import QueryBuilder from "../../builder/QueryBuilder"
 import { INewsletter } from "./newsletter.interface"
 import { Newsletter } from "./newsletter.modle"
 
@@ -8,9 +9,18 @@ export const createNewsletter = async (data: INewsletter) => {
 }
 
 // get all newsletters
-export const getAllNewsletters = async () => {
-  const newsletters = await Newsletter.find()
-  return newsletters
+export const getAllNewsletters = async (query: Record<string, unknown>) => {
+  const newsletterQuery = new QueryBuilder(Newsletter.find(), query)
+    .search(['email'])
+    .filter()
+    .paginate()
+
+  const newsletters = await newsletterQuery.modelQuery
+  const pagenateInfo = await newsletterQuery.getPaginationInfo()
+  return {
+    newsletters,
+    meta:pagenateInfo,
+  }
 }
 // delete newsletter
 export const deleteNewsletter = async (id: string) => {

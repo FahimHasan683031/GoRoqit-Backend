@@ -17,9 +17,6 @@ const createJob = async (user: JwtPayload, payload: IJob): Promise<IJob> => {
     if (!isExistUser) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found!')
     }
-    if (!isExistUser.profileCompletion || isExistUser.profileCompletion < 70) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Please complete your profile first!')
-    }
     if (user.role !== USER_ROLES.RECRUITER) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,

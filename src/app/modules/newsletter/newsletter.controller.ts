@@ -21,7 +21,7 @@ const createNewsletter = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllNewsletters = catchAsync(async (req: Request, res: Response) => {
-  const result = await newsletterService.getAllNewsletters();
+  const result = await newsletterService.getAllNewsletters(req.query);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
