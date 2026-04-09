@@ -15,6 +15,16 @@ const jobSchema = new Schema<IJob>(
     description: { type: String },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     jobLocation: { type: String, required: true },
+    location: {
+      type: {
+        type: String,
+        default: 'Point',
+      },
+      coordinates: {
+        type: [Number],
+        default: [0, 0],
+      },
+    },
     applicationsCount: { type: Number, default: 0 },
     experianceLabel: { type: String, enum: ['Junior', 'Mid-Level', 'Senior', 'Master'], required: true },
   },

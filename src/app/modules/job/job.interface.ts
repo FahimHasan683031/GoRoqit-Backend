@@ -12,6 +12,10 @@ export interface IJob {
   rent?: number
   description?: string
   jobLocation: string
+  location: {
+    type: 'Point';
+    coordinates: number[];
+  };
   user: Types.ObjectId
   experianceLabel: 'Junior' | 'Mid-Level' | 'Senior'|"Master"
   applicationsCount?: number

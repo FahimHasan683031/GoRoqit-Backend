@@ -42,6 +42,7 @@ export type IUser = {
   roleProfile?: 'ApplicantProfile' | 'RecruiterProfile' | null;
   createdAt: Date;
   updatedAt: Date;
+  coordinates: number[];
   subscribe?: boolean;
   profileCompletion?: number;
 };

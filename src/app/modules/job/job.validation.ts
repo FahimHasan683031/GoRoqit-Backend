@@ -14,6 +14,10 @@ export const JobValidations = {
       rent: z.number().min(0).optional(),
       description: z.string(),
       jobLocation: z.string().min(3),
+      location: z.object({
+        type: z.literal('Point'),
+        coordinates: z.array(z.number()),
+      }),
       experianceLabel: z.enum(['Junior', 'Mid-Level', 'Senior', 'Master']),
     }),
   }),
@@ -31,6 +35,10 @@ export const JobValidations = {
       rent: z.number().min(0).optional(),
       description: z.string().optional(),
       jobLocation: z.string().min(3).optional(),
+      location: z.object({
+        type: z.literal('Point'),
+        coordinates: z.array(z.number()),
+      }).optional(),
       experianceLabel: z.enum(['Junior', 'Mid-Level', 'Senior', 'Master']).optional(),
     }),
   }),

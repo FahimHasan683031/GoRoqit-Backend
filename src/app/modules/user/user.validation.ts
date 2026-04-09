@@ -10,6 +10,7 @@ export const userSignupSchema = z.object({
   role: z.nativeEnum(USER_ROLES),
   image: z.string().optional(),
   password: z.string().min(6),
+  coordinates: z.array(z.number()).optional(),
  })
 });
 
@@ -26,6 +27,8 @@ export const userUpdateSchema = z.object({
   verified: z.boolean().optional(),
   companyName: z.string().optional(),
   role: z.nativeEnum(USER_ROLES).optional(),
+  image: z.string().optional(),
+  coordinates: z.array(z.number()).optional(),
 });
 
 
@@ -38,7 +41,7 @@ export const UniversalProfileUpdateSchema = z.object({
     phone: z.string().optional(),
     mobile: z.string().optional(),
     image: z.string().optional(),
-    
+    coordinates: z.array(z.number()).optional(),
     // Applicant fields (all optional)
     resume: z.string().optional(),
     skills: z.array(z.string()).optional(),

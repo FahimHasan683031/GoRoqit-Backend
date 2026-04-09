@@ -58,6 +58,10 @@ const UserSchema = new Schema<IUser, UserModel>(
       type: String,
       required: false,
     },
+    coordinates: {
+        type: [Number],
+        default: [0, 0],
+      },
     profileCompletion: { type: Number, default: 0 },
     authentication: {
       _id: false,
