@@ -164,7 +164,12 @@ const getSingleApplication = async (id: string): Promise<IApplication> => {
 
   const result = await Application.findById(id).populate([
     'job',
-    'applicant',
+    {
+      path: 'applicant',
+      populate: {
+        path: 'profile'
+      }
+    },
     'author',
   ])
   if (!result) {
