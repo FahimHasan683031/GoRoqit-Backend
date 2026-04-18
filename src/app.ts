@@ -16,8 +16,8 @@ const app = express();
 
 const allowedOrigins = [
   'https://goroqit.com',
-  'https://www.goroqit.com',   // add www version
-  'http://goroqit.com',        // optional if non-SSL
+  'https://www.goroqit.com',   
+  'http://goroqit.com',       
   'http://localhost:3000',
   'http://10.10.7.45:3000'
 ];

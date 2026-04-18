@@ -33,4 +33,6 @@ const jobSchema = new Schema<IJob>(
   }
 );
 
+jobSchema.index({ location: '2dsphere' });
+
 export const Job = model<IJob>('Job', jobSchema);

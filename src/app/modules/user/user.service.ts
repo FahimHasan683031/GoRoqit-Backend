@@ -132,9 +132,12 @@ export const updateProfile = async (
             payload.lastName,
         }),
       ...(payload.image && { image: payload.image }),
+      ...(payload.coordinates && { coordinates: payload.coordinates }),
     },
     { new: true },
   )
+
+
 
   // 2. Update role-based profile
   if (isExistUser.role === USER_ROLES.APPLICANT && isExistUser.profile) {

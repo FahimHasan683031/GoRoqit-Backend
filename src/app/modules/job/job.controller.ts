@@ -66,6 +66,39 @@ const getAllJobs = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyJobs = catchAsync(async (req: Request, res: Response) => {
+  const result = await JobServices.getMyJobs(req.user!, req.query);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'My jobs retrieved successfully',
+    data: result,
+  });
+});
+
+const getJobsByDistance = catchAsync(async (req: Request, res: Response) => {
+  const result = await JobServices.getJobsByDistance(req.user!, req.query);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Jobs retrieved by distance successfully',
+    data: result,
+  });
+});
+
+const getRecruiterStatistics = catchAsync(async (req: Request, res: Response) => {
+  const result = await JobServices.getRecruiterStatistics(req.user!);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Recruiter statistics retrieved successfully',
+    data: result,
+  });
+});
+
 const deleteJob = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await JobServices.deleteJob(req.user!, id);
@@ -83,5 +116,8 @@ export const JobController = {
   updateJob,
   getSingleJob,
   getAllJobs,
+  getMyJobs,
+  getJobsByDistance,
+  getRecruiterStatistics,
   deleteJob,
 };

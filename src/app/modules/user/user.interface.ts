@@ -89,6 +89,7 @@ export interface IUpdateProfilePayload {
   companyLogo?: string;
   companyEmail?: string;
   location?: string;
+  coordinates?: number[];
 }
 
 export type UserModel = {

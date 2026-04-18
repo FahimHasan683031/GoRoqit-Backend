@@ -15,6 +15,24 @@ router.get(
 );
 
 router.get(
+  '/my-jobs',
+  auth(USER_ROLES.RECRUITER),
+  JobController.getMyJobs
+);
+
+router.get(
+  '/get-jobs-by-distance',
+  auth(USER_ROLES.APPLICANT),
+  JobController.getJobsByDistance
+);
+
+router.get(
+  '/recruiter-statistics',
+  auth(USER_ROLES.RECRUITER),
+  JobController.getRecruiterStatistics
+);
+
+router.get(
   '/:id',
   JobController.getSingleJob
 );
