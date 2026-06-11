@@ -13,7 +13,6 @@ router.route("/")
         PlanController.createPlan
     )
     .get(
-         auth(USER_ROLES.ADMIN, USER_ROLES.RECRUITER),
         PlanController.getPlan
     )
 
